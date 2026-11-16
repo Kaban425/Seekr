@@ -1,0 +1,24 @@
+﻿<Application x:Class="Seekr.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:converters="clr-namespace:Seekr.App.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
+                <ResourceDictionary Source="Styles/VisualSystem.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+            <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBoolToVisibility" />
+            <converters:FileIconConverter x:Key="FileIconConverter" />
+            <converters:NotNullToBoolConverter x:Key="NotNullToBool" />
+            <converters:NullToVisibilityConverter x:Key="NullToVisibility" />
+            <converters:NotNullToVisibilityConverter x:Key="NotNullToVisibility" />
+            <converters:CountToVisibilityConverter x:Key="CountToVisibility" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

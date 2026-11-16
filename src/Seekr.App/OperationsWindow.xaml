@@ -1,0 +1,35 @@
+<ui:FluentWindow x:Class="Seekr.App.OperationsWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" xmlns:services="clr-namespace:Seekr.App.Services"
+ UseLayoutRounding="True" SnapsToDevicePixels="True" Foreground="{DynamicResource Seekr.TextPrimary}" Background="{DynamicResource Seekr.MenuSurface}" FontFamily="{DynamicResource Seekr.TextFont}" FontSize="13" Title="Файловые операции" Width="760" Height="560" MinWidth="540" MinHeight="360" WindowStartupLocation="CenterOwner">
+ <DockPanel Margin="24" LayoutTransform="{DynamicResource Seekr.ContentScale}">
+  <Button DockPanel.Dock="Bottom" Content="Закрыть" HorizontalAlignment="Right" Padding="18,8" Margin="0,12,0,0" Click="Close_Click"/>
+  <TextBlock DockPanel.Dock="Top" Text="Файловые операции" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,8"/>
+  <TextBlock DockPanel.Dock="Top" Text="Задания выполняются по очереди. Перемещение отменяется после текущего файла." TextWrapping="Wrap" Opacity="0.75" Margin="0,0,0,16"/>
+  <Expander DockPanel.Dock="Top" Header="Что можно отменить через Ctrl+Z" Margin="0,0,0,12"><TextBlock Text="{x:Static services:FileOperationService.UndoLimits}" TextWrapping="Wrap" Margin="8"/></Expander>
+  <ListBox ItemsSource="{Binding Jobs}" AutomationProperties.Name="Очередь и история операций" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+   <ListBox.ItemTemplate><DataTemplate>
+    <Border Padding="12" Margin="0,0,0,8" Background="{DynamicResource Seekr.Surface}" CornerRadius="6">
+     <StackPanel>
+      <TextBlock Text="{Binding Title}" TextWrapping="Wrap" FontWeight="SemiBold"/>
+      <TextBlock Text="{Binding Status}" Margin="0,6,0,4"/>
+      <ProgressBar Value="{Binding Progress}" Height="4" Maximum="100"/>
+      <TextBlock Text="{Binding Detail}" TextWrapping="Wrap" MaxHeight="140" Margin="0,8,0,8"/>
+      <ItemsControl ItemsSource="{Binding Failures}"><ItemsControl.ItemTemplate><DataTemplate>
+       <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Seekr.Border}" Padding="0,8"><StackPanel>
+        <TextBlock Text="{Binding Path}" TextWrapping="Wrap" FontWeight="SemiBold"/>
+        <TextBlock Text="{Binding Error}" TextWrapping="Wrap" Margin="0,4"/>
+        <Button Content="Кто использует?" HorizontalAlignment="Left" Command="{Binding DataContext.InspectFailureCommand, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" CommandParameter="{Binding Path}"/>
+       </StackPanel></Border>
+      </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+      <TextBlock Text="Повторить — только неудачные файлы. Закрыть — оставить ошибки в истории и продолжить работу." TextWrapping="Wrap" Margin="0,4,0,8"/>
+      <StackPanel Orientation="Horizontal">
+       <Button Content="Отменить" Command="{Binding CancelCommand}" Margin="0,0,8,0" Visibility="{Binding IsFinished, Converter={StaticResource InvertedBoolToVisibility}}"/>
+       <Button Content="Пропустить ошибки" Command="{Binding SkipFailuresCommand}" Margin="0,0,8,0" Visibility="{Binding CanRetry, Converter={StaticResource BoolToVisibility}}"/>
+       <Button Content="Повторить" Command="{Binding RetryCommand}" Visibility="{Binding CanRetry, Converter={StaticResource BoolToVisibility}}"/>
+      </StackPanel>
+     </StackPanel>
+    </Border>
+   </DataTemplate></ListBox.ItemTemplate>
+  </ListBox>
+ </DockPanel>
+</ui:FluentWindow>

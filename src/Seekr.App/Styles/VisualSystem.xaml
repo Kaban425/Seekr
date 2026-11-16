@@ -1,0 +1,112 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+ xmlns:icons="clr-namespace:Seekr.App.Icons" xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+ <!-- Semantic defaults; ThemeService replaces these brushes when the theme changes. -->
+ <SolidColorBrush x:Key="Seekr.Canvas" Color="#202020"/>
+ <SolidColorBrush x:Key="Seekr.WorkspaceBackground" Color="#202020"/>
+ <SolidColorBrush x:Key="Seekr.Sidebar" Color="#191919"/>
+ <SolidColorBrush x:Key="Seekr.MenuSurface" Color="#292929"/>
+ <SolidColorBrush x:Key="Seekr.Surface" Color="#292929"/>
+ <SolidColorBrush x:Key="Seekr.Hover" Color="#333333"/>
+ <SolidColorBrush x:Key="Seekr.Pressed" Color="#3D3D3D"/>
+ <SolidColorBrush x:Key="Seekr.Selection" Color="#354353"/>
+ <SolidColorBrush x:Key="Seekr.InactiveSelection" Color="#30343A"/>
+ <SolidColorBrush x:Key="Seekr.Divider" Color="#284A4A4A"/>
+ <SolidColorBrush x:Key="Seekr.Border" Color="#4A4A4A"/>
+ <SolidColorBrush x:Key="Seekr.SubtleRim" Color="#60D7EFFF"/>
+ <SolidColorBrush x:Key="Seekr.TextPrimary" Color="#F4F4F4"/>
+ <SolidColorBrush x:Key="Seekr.TextSecondary" Color="#BEBEBE"/>
+ <SolidColorBrush x:Key="Seekr.Focus" Color="#FFFFFF"/>
+ <SolidColorBrush x:Key="Seekr.ErrorSurface" Color="#382526"/>
+ <SolidColorBrush x:Key="Seekr.ErrorText" Color="#FFB4AB"/>
+ <SolidColorBrush x:Key="Seekr.ErrorBorder" Color="#E78C86"/>
+ <sys:String x:Key="Seekr.ButtonStyle">Default</sys:String>
+ <CornerRadius x:Key="Seekr.ControlRadius">4</CornerRadius>
+ <FontFamily x:Key="Seekr.TextFont">Segoe UI Variable Text, Segoe UI</FontFamily>
+ <FontFamily x:Key="Seekr.CommandFont">Segoe UI</FontFamily><sys:Double x:Key="Seekr.CommandFontSize">13</sys:Double><sys:Double x:Key="Seekr.UiScale">1</sys:Double>
+ <ScaleTransform x:Key="Seekr.ContentScale" ScaleX="1" ScaleY="1"/>
+ <Style x:Key="Seekr.Icon" TargetType="icons:SeekrIcon">
+  <Setter Property="Width" Value="16"/><Setter Property="Height" Value="16"/><Setter Property="VerticalAlignment" Value="Center"/>
+  <Setter Property="HorizontalAlignment" Value="Center"/><Setter Property="IsHitTestVisible" Value="False"/>
+  <Setter Property="Focusable" Value="False"/>
+ </Style>
+ <Style x:Key="Seekr.CommandButton" TargetType="Button">
+  <Setter Property="Tag" Value="{DynamicResource Seekr.ButtonStyle}"/>
+  <Setter Property="Foreground" Value="{DynamicResource Seekr.TextPrimary}"/>
+  <Setter Property="FontFamily" Value="{DynamicResource Seekr.CommandFont}"/><Setter Property="FontSize" Value="{DynamicResource Seekr.CommandFontSize}"/>
+  <Setter Property="Padding" Value="12,6"/><Setter Property="MinHeight" Value="34"/>
+  <Setter Property="MinWidth" Value="32"/><Setter Property="Background" Value="Transparent"/>
+  <Setter Property="BorderBrush" Value="Transparent"/><Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+   <Grid SnapsToDevicePixels="True">
+    <Border x:Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="{DynamicResource Seekr.ControlRadius}" Padding="{TemplateBinding Padding}">
+     <Grid><Border x:Name="BevelTop" BorderThickness="2,2,0,0" BorderBrush="#E0CB8D" Visibility="Collapsed" Margin="-8,-3" IsHitTestVisible="False"/><Border x:Name="BevelBottom" BorderThickness="0,0,2,2" BorderBrush="#080E23" Visibility="Collapsed" Margin="-8,-3" IsHitTestVisible="False"/><ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" RecognizesAccessKey="True"/></Grid>
+    </Border>
+    <Border x:Name="FocusRing" CornerRadius="{DynamicResource Seekr.ControlRadius}" BorderThickness="2" BorderBrush="{DynamicResource Seekr.Focus}" Visibility="Collapsed" IsHitTestVisible="False"/>
+   </Grid>
+   <ControlTemplate.Triggers>
+    <Trigger Property="Tag" Value="Graphite"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource Seekr.Surface}"/><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource Seekr.SubtleRim}"/><Setter TargetName="Surface" Property="BorderThickness" Value="1"/></Trigger>
+    <Trigger Property="Tag" Value="Blueprint"><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource Seekr.Border}"/><Setter TargetName="Surface" Property="Background" Value="{DynamicResource Seekr.Surface}"/></Trigger><Trigger Property="Tag" Value="Paper"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource Seekr.Surface}"/><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource Seekr.Divider}"/><Setter TargetName="BevelBottom" Property="Visibility" Value="Visible"/><Setter TargetName="BevelBottom" Property="BorderBrush" Value="{DynamicResource Seekr.Divider}"/></Trigger><Trigger Property="Tag" Value="Terminal"><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource Seekr.Divider}"/><Setter TargetName="Surface" Property="Background" Value="{DynamicResource Seekr.Surface}"/></Trigger><Trigger Property="Tag" Value="Studio"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource Seekr.Surface}"/></Trigger><Trigger Property="Tag" Value="Lagoon"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource Seekr.Surface}"/></Trigger><Trigger Property="Tag" Value="Arcade"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource Seekr.Surface}"/><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource Seekr.Border}"/><Setter TargetName="Surface" Property="BorderThickness" Value="2"/><Setter TargetName="BevelTop" Property="Visibility" Value="Visible"/><Setter TargetName="BevelBottom" Property="Visibility" Value="Visible"/></Trigger>
+    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource Seekr.Hover}"/></Trigger>
+    <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource Seekr.Pressed}"/></Trigger>
+    <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusRing" Property="Visibility" Value="Visible"/></Trigger>
+    <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+  <Setter Property="HorizontalContentAlignment" Value="Center"/>
+ </Style>
+ <Style x:Key="Seekr.IconButton" TargetType="Button" BasedOn="{StaticResource Seekr.CommandButton}">
+  <Setter Property="Width" Value="34"/><Setter Property="Height" Value="34"/><Setter Property="Padding" Value="6"/>
+ </Style>
+ <Style TargetType="Button" BasedOn="{StaticResource Seekr.CommandButton}"/>
+ <Style x:Key="Seekr.SearchInput" TargetType="TextBox">
+  <Setter Property="Foreground" Value="{DynamicResource Seekr.TextPrimary}"/>
+  <Setter Property="CaretBrush" Value="{DynamicResource Seekr.TextPrimary}"/>
+  <Setter Property="SelectionBrush" Value="{DynamicResource Seekr.Selection}"/>
+  <Setter Property="SelectionTextBrush" Value="{DynamicResource Seekr.TextPrimary}"/>
+  <Setter Property="Background" Value="Transparent"/><Setter Property="BorderThickness" Value="0"/>
+  <Setter Property="FontSize" Value="13"/><Setter Property="FontFamily" Value="{DynamicResource Seekr.TextFont}"/>
+  <Setter Property="Padding" Value="4,0"/><Setter Property="MinWidth" Value="0"/>
+  <Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TextBox">
+   <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" ClipToBounds="True">
+    <ScrollViewer x:Name="PART_ContentHost" Focusable="False" VerticalAlignment="Center"/>
+   </Border>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+ <Style x:Key="Seekr.FormInput" TargetType="ui:TextBox" BasedOn="{StaticResource Seekr.SearchInput}">
+  <Setter Property="Padding" Value="10,6"/><Setter Property="MinHeight" Value="34"/>
+  <Setter Property="Background" Value="{DynamicResource Seekr.Surface}"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ui:TextBox">
+   <Border x:Name="InputBorder" Background="{TemplateBinding Background}" BorderBrush="{DynamicResource Seekr.Border}" BorderThickness="1" CornerRadius="{DynamicResource Seekr.ControlRadius}" Padding="{TemplateBinding Padding}">
+    <Grid><ScrollViewer x:Name="PART_ContentHost" Focusable="False" VerticalAlignment="Center"/>
+     <TextBlock x:Name="Placeholder" Text="{TemplateBinding PlaceholderText}" Foreground="{DynamicResource Seekr.TextSecondary}" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Collapsed"/>
+    </Grid>
+   </Border>
+   <ControlTemplate.Triggers>
+    <Trigger Property="Text" Value=""><Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/></Trigger>
+    <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="InputBorder" Property="BorderBrush" Value="{DynamicResource Seekr.Focus}"/></Trigger>
+    <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+ <Style x:Key="Seekr.StateAction" TargetType="Button" BasedOn="{StaticResource Seekr.CommandButton}">
+  <Setter Property="Background" Value="{DynamicResource Seekr.Surface}"/>
+  <Setter Property="BorderBrush" Value="{DynamicResource Seekr.Border}"/>
+ </Style>
+ <Style x:Key="Seekr.ActionButton" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+  <Setter Property="MinHeight" Value="34"/><Setter Property="FontSize" Value="13"/>
+  <Setter Property="FontFamily" Value="{DynamicResource Seekr.TextFont}"/><Setter Property="Padding" Value="12,6"/>
+ </Style>
+ <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
+  <Setter Property="Opacity" Value="1"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ContextMenu"><Border Background="{DynamicResource Seekr.MenuSurface}" BorderBrush="{DynamicResource Seekr.Border}" BorderThickness="1" CornerRadius="8" Padding="4"><ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/></ScrollViewer></Border></ControlTemplate></Setter.Value></Setter>
+  <Setter Property="LayoutTransform" Value="{DynamicResource Seekr.ContentScale}"/>
+  <Setter Property="Foreground" Value="{DynamicResource Seekr.TextPrimary}"/>
+  <Setter Property="Background" Value="{DynamicResource Seekr.MenuSurface}"/>
+ </Style>
+</ResourceDictionary>
+
+
+
+

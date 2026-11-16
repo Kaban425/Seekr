@@ -1,0 +1,23 @@
+<UserControl x:Class="Seekr.App.OperationNotice"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:icons="clr-namespace:Seekr.App.Icons"
+ UseLayoutRounding="True" MaxWidth="380" MinWidth="260" Foreground="{DynamicResource Seekr.TextPrimary}" FontFamily="{DynamicResource Seekr.TextFont}" FontSize="13"
+ Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}">
+ <Border Background="{DynamicResource Seekr.MenuSurface}" CornerRadius="10" Padding="14" BorderThickness="1" BorderBrush="{DynamicResource Seekr.Divider}">
+  <StackPanel>
+   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <TextBlock Text="{Binding Current.Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip="{Binding Current.Title}"/>
+    <Button Grid.Column="1" Style="{StaticResource Seekr.IconButton}" Command="{Binding DismissCommand}" ToolTip="Скрыть панель — операция продолжится" AutomationProperties.Name="Скрыть ход операций"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Close"/></Button>
+   </Grid>
+   <TextBlock Text="{Binding Current.Status}" Margin="0,2,0,8"/>
+   <ProgressBar Value="{Binding Current.Progress}" Maximum="100" Height="4" AutomationProperties.Name="Ход файловой операции"/>
+   <TextBlock Text="{Binding Current.Detail}" TextTrimming="CharacterEllipsis" Margin="0,8,0,4" ToolTip="{Binding Current.Detail}"/>
+   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <TextBlock Text="{Binding ActiveCount, StringFormat='В работе: {0}'}" VerticalAlignment="Center" FontSize="12"/>
+    <Button Grid.Column="1" Content="Отменить" Command="{Binding Current.CancelCommand}" Visibility="{Binding Current.IsFinished, Converter={StaticResource InvertedBoolToVisibility}}" Padding="8,4" Margin="4,0"/>
+    <Button Grid.Column="2" Content="Подробнее" Click="Details_Click" Padding="8,4" AutomationProperties.Name="Развернуть список файловых операций"/>
+   </Grid>
+  </StackPanel>
+ </Border>
+</UserControl>

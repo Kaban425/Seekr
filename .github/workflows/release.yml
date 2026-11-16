@@ -1,0 +1,32 @@
+name: Build release candidate
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (major.minor.patch)'
+        default: '1.0.6'
+        required: true
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build unsigned candidate and run tests
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_BUILD: ${{ github.run_number }}
+        run: ./scripts/build-release.ps1 -Version $env:RELEASE_VERSION -BuildNumber ([int]$env:RELEASE_BUILD)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Seekr-unsigned-candidate
+          path: |
+            artifacts/release/**/*.msi
+            artifacts/release/**/*.zip
+            artifacts/release/**/*-Setup.exe
+            artifacts/release/**/release-manifest.json

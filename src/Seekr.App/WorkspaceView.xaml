@@ -1,0 +1,311 @@
+<UserControl x:Class="Seekr.App.WorkspaceView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:icons="clr-namespace:Seekr.App.Icons" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" xmlns:vm="clr-namespace:Seekr.App.ViewModels"
+ Loaded="WorkspaceView_Loaded" Unloaded="WorkspaceView_Unloaded" SizeChanged="WorkspaceView_SizeChanged" Background="{DynamicResource Seekr.WorkspaceBackground}" Foreground="{DynamicResource Seekr.TextPrimary}" FontFamily="{DynamicResource Seekr.TextFont}" FontSize="13" UseLayoutRounding="True" SnapsToDevicePixels="True">
+ <UserControl.Resources>
+  <Style x:Key="CommandButton" TargetType="Button" BasedOn="{StaticResource Seekr.CommandButton}"/>
+  <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource Seekr.IconButton}"/>
+  <Style x:Key="ToolbarDivider" TargetType="Border"><Setter Property="Width" Value="1"/><Setter Property="Height" Value="22"/><Setter Property="Margin" Value="8,0"/><Setter Property="Background" Value="{DynamicResource Seekr.Divider}"/></Style>
+  <Style x:Key="QuietCheckbox" TargetType="CheckBox">
+   <Setter Property="Width" Value="24"/><Setter Property="MinWidth" Value="24"/><Setter Property="Height" Value="24"/><Setter Property="Padding" Value="0"/><Setter Property="Opacity" Value="0"/><Setter Property="VerticalAlignment" Value="Center"/>
+   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="CheckBox">
+    <Border x:Name="Box" Width="16" Height="16" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource ControlStrongStrokeColorDefaultBrush}" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center">
+     <icons:SeekrIcon x:Name="Tick" Kind="Check" Width="12" Height="12" Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+    </Border>
+    <ControlTemplate.Triggers>
+     <Trigger Property="IsChecked" Value="True"><Setter TargetName="Box" Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}"/><Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}"/><Setter TargetName="Tick" Property="Visibility" Value="Visible"/></Trigger>
+     <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Seekr.Focus}"/><Setter TargetName="Box" Property="BorderThickness" Value="2"/></Trigger>
+    </ControlTemplate.Triggers>
+   </ControlTemplate></Setter.Value></Setter>
+   <Style.Triggers>
+    <Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="Opacity" Value="1"/></Trigger>
+    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListViewItem}}" Value="True"><Setter Property="Opacity" Value="1"/></DataTrigger>
+    <DataTrigger Binding="{Binding DataContext.ShowCheckboxes, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True"><Setter Property="Opacity" Value="1"/></DataTrigger>
+    <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter Property="Opacity" Value="1"/></Trigger>
+   </Style.Triggers>
+  </Style>
+  <Style x:Key="NavigationNode" TargetType="TreeViewItem">
+   <Setter Property="Foreground" Value="{DynamicResource Seekr.TextPrimary}"/>
+   <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/><Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+   <Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="ToolTip" Value="{Binding Path}"/><Setter Property="AutomationProperties.Name" Value="{Binding Label}"/>
+   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TreeViewItem">
+    <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+     <Border x:Name="NodeRow" MinHeight="32" Margin="4,0" Padding="2,0,8,0" Background="Transparent" CornerRadius="4" BorderThickness="1" BorderBrush="Transparent">
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+       <ToggleButton x:Name="Expander" Width="18" MinWidth="0" Height="24" MinHeight="0" Padding="0" BorderThickness="0" HorizontalAlignment="Center" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Focusable="False" AutomationProperties.Name="{Binding Label, StringFormat=Развернуть: {0}}">
+        <ToggleButton.Template><ControlTemplate TargetType="ToggleButton"><Border Background="Transparent"><icons:SeekrIcon x:Name="Arrow" Kind="Chevron" Width="10" Height="10" Opacity="0.7" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5"/></Border><ControlTemplate.Triggers><Trigger Property="IsChecked" Value="True"><Setter TargetName="Arrow" Property="RenderTransform"><Setter.Value><RotateTransform Angle="90"/></Setter.Value></Setter></Trigger></ControlTemplate.Triggers></ControlTemplate></ToggleButton.Template>
+       </ToggleButton>
+       <ContentPresenter Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" Margin="4,0,0,0"/>
+      </Grid>
+     </Border>
+     <ItemsPresenter x:Name="ChildrenHost" Grid.Row="1" Margin="16,0,0,0" Visibility="Collapsed"/>
+    </Grid>
+    <ControlTemplate.Triggers>
+     <Trigger Property="IsExpanded" Value="True"><Setter TargetName="ChildrenHost" Property="Visibility" Value="Visible"/></Trigger>
+     <Trigger Property="HasItems" Value="False"><Setter TargetName="Expander" Property="Visibility" Value="Hidden"/></Trigger>
+     <Trigger SourceName="NodeRow" Property="IsMouseOver" Value="True"><Setter TargetName="NodeRow" Property="Background" Value="{DynamicResource Seekr.Hover}"/></Trigger>
+     <Trigger Property="IsSelected" Value="True"><Setter TargetName="NodeRow" Property="Background" Value="{DynamicResource Seekr.Selection}"/></Trigger>
+     <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="NodeRow" Property="BorderBrush" Value="{DynamicResource Seekr.Focus}"/></Trigger>
+     <DataTrigger Binding="{Binding IsSeparator}" Value="True"><Setter TargetName="NodeRow" Property="MinHeight" Value="12"/><Setter TargetName="Expander" Property="Visibility" Value="Hidden"/><Setter Property="Focusable" Value="False"/><Setter TargetName="NodeRow" Property="IsHitTestVisible" Value="False"/></DataTrigger>
+     <DataTrigger Binding="{Binding IsPlaceholder}" Value="True"><Setter Property="IsEnabled" Value="False"/></DataTrigger>
+    </ControlTemplate.Triggers>
+   </ControlTemplate></Setter.Value></Setter>
+  </Style>
+ </UserControl.Resources>
+ <Grid>
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="30"/></Grid.RowDefinitions>
+  <StackPanel Grid.Row="0" x:Name="WorkspaceHeader">
+   <Grid Margin="8,0" x:Name="NavigationRow">
+    <Grid.RowDefinitions><RowDefinition Height="50"/><RowDefinition x:Name="SearchRow" Height="0"/></Grid.RowDefinitions>
+    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition x:Name="SearchColumn" Width="340"/></Grid.ColumnDefinitions>
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0"><Button Style="{StaticResource IconButton}" Command="{Binding NavigateBackCommand}" ToolTip="Назад · Alt+←" AutomationProperties.Name="Назад · Alt+←"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Back"/></Button>
+<Button Style="{StaticResource IconButton}" Command="{Binding NavigateForwardCommand}" ToolTip="Вперёд · Alt+→" AutomationProperties.Name="Вперёд · Alt+→"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Forward"/></Button>
+<Button Style="{StaticResource IconButton}" Command="{Binding NavigateUpCommand}" ToolTip="Вверх" AutomationProperties.Name="Вверх"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Up"/></Button>
+<Button Style="{StaticResource IconButton}" Command="{Binding RefreshCommand}" ToolTip="Обновить" AutomationProperties.Name="Обновить"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Refresh"/></Button></StackPanel>
+    <Border x:Name="AddressBar" Grid.Column="1" Height="34" VerticalAlignment="Center" Margin="0,0,10,0" Padding="8,0" CornerRadius="5" Background="{DynamicResource Seekr.Surface}" MouseLeftButtonDown="AddressBar_MouseLeftButtonDown" ToolTip="Путь к папке · Ctrl+L" ClipToBounds="True">
+     <Grid><ScrollViewer x:Name="AddressBreadcrumbs" ScrollChanged="AddressBreadcrumbs_ScrollChanged" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False">
+      <ItemsControl ItemsSource="{Binding Breadcrumb}" VerticalAlignment="Center"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+       <ItemsControl.ItemTemplate><DataTemplate><StackPanel Orientation="Horizontal" VerticalAlignment="Center"><Button Content="{Binding Label}" Command="{Binding DataContext.NavigateToSegmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Index}" Style="{StaticResource CommandButton}" Padding="7,3"/><TextBlock Text="›" Margin="3,0" FontSize="18" Opacity="0.55" VerticalAlignment="Center"/></StackPanel></DataTemplate></ItemsControl.ItemTemplate>
+      </ItemsControl>
+     </ScrollViewer>
+     <TextBox x:Name="AddressEditor" SelectionTextBrush="{DynamicResource Seekr.TextPrimary}" CaretBrush="{DynamicResource Seekr.TextPrimary}" SelectionBrush="{DynamicResource Seekr.Selection}" Visibility="Collapsed" VerticalContentAlignment="Center" Background="Transparent" Foreground="{DynamicResource Seekr.TextPrimary}" BorderThickness="0" AutomationProperties.Name="Путь к папке" PreviewKeyDown="AddressEditor_KeyDown" LostKeyboardFocus="AddressEditor_LostKeyboardFocus"/>
+     </Grid>
+    </Border>
+    <Border x:Name="SearchSurface" Grid.Column="2" Height="34" VerticalAlignment="Center" CornerRadius="4" Background="{DynamicResource Seekr.Surface}" BorderThickness="1">
+     <Border.Style><Style TargetType="Border"><Setter Property="BorderBrush" Value="{DynamicResource Seekr.Border}"/><Style.Triggers><DataTrigger Binding="{Binding IsKeyboardFocusWithin, ElementName=SearchBox}" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource Seekr.Focus}"/></DataTrigger></Style.Triggers></Style></Border.Style>
+     <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <Grid Margin="8,0,4,0"><Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+       <icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Search"/>
+       <TextBox Grid.Column="1" x:Name="SearchBox" Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource Seekr.SearchInput}" AutomationProperties.Name="Поиск файлов" PreviewKeyDown="SearchBox_PreviewKeyDown" GotKeyboardFocus="SearchBox_FocusChanged" LostKeyboardFocus="SearchBox_FocusChanged"/>
+       <TextBlock Grid.Column="1" Text="{Binding SearchPlaceholder}" Margin="4,0" VerticalAlignment="Center" Foreground="{DynamicResource Seekr.TextSecondary}" TextTrimming="CharacterEllipsis" IsHitTestVisible="False"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+      </Grid>
+      <Button x:Name="SearchScopeButton" MinWidth="64" Grid.Column="1" Content="{Binding SearchScopeLabel}" Style="{StaticResource CommandButton}" Padding="6,3" FontSize="11" Click="OpenCommandMenu_Click" AutomationProperties.Name="Область поиска"><Button.ContextMenu><ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"><MenuItem Header="В этой папке" Command="{Binding SetSearchScopeCommand}" CommandParameter="folder" IsEnabled="{Binding CurrentPath, Converter={StaticResource NotNullToBool}}"/><MenuItem Header="По всем дискам" Command="{Binding SetSearchScopeCommand}" CommandParameter="all"/></ContextMenu></Button.ContextMenu></Button>
+      <Button x:Name="FilterAnchor" Grid.Column="2" Style="{StaticResource IconButton}" Width="28" Height="30" Command="{Binding FilterCommand}" ToolTip="Фильтры поиска" AutomationProperties.Name="Фильтры поиска"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Filter"/></Button>
+      <Button x:Name="SaveSearchAnchor" Grid.Column="3" Style="{StaticResource IconButton}" Width="28" Height="30" Command="{Binding SaveSearchCommand}" ToolTip="Сохранить поиск" AutomationProperties.Name="Сохранить поиск" Visibility="{Binding HasQuery, Converter={StaticResource BoolToVisibility}}"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Bookmark"/></Button>
+      <Button Grid.Column="4" Content="Стоп" Style="{StaticResource CommandButton}" Command="{Binding CancelSearchCommand}" Visibility="{Binding ShowSearchProgress, Converter={StaticResource BoolToVisibility}}" AutomationProperties.Name="Отменить поиск"/>
+     </Grid>
+    </Border>
+   </Grid>
+   <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Seekr.Divider}">
+    <Grid Height="44" Margin="10,0"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+      <Button x:Name="CreateFolderButton" Command="{Binding CreateFolderCommand}" Style="{StaticResource CommandButton}" ToolTip="Создать папку" AutomationProperties.Name="Создать папку"><StackPanel Orientation="Horizontal"><icons:SeekrIcon x:Name="CreateIcon" Style="{StaticResource Seekr.Icon}" Kind="Add" Margin="0,0,8,0"/><TextBlock x:Name="CreateLabel" Text="Создать"/></StackPanel></Button>
+      <StackPanel x:Name="EditActions" Orientation="Horizontal"><Border Style="{StaticResource ToolbarDivider}"/>
+      <Button Style="{StaticResource IconButton}" Command="{Binding CutFilesCommand}" ToolTip="Вырезать · Ctrl+X" AutomationProperties.Name="Вырезать · Ctrl+X" IsEnabled="{Binding HasSelection}"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Cut"/></Button>
+<Button Style="{StaticResource IconButton}" Command="{Binding CopyFilesCommand}" ToolTip="Копировать · Ctrl+C" AutomationProperties.Name="Копировать · Ctrl+C" IsEnabled="{Binding HasSelection}"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Copy"/></Button>
+<Button Style="{StaticResource IconButton}" Command="{Binding PasteFilesCommand}" ToolTip="Вставить · Ctrl+V" AutomationProperties.Name="Вставить · Ctrl+V"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Paste"/></Button>
+<Button Style="{StaticResource IconButton}" Command="{Binding RenameSelectedCommand}" ToolTip="Переименовать · F2" AutomationProperties.Name="Переименовать · F2" IsEnabled="{Binding HasSelection}"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Rename"/></Button>
+<Button Style="{StaticResource IconButton}" Command="{Binding DeleteSelectedCommand}" ToolTip="В корзину · Delete" AutomationProperties.Name="В корзину · Delete" IsEnabled="{Binding HasSelection}"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Delete"/></Button>
+      <Border Style="{StaticResource ToolbarDivider}"/>
+      </StackPanel><Button ToolTip="{Binding SortDescription}" x:Name="SortMenuButton" Style="{StaticResource CommandButton}" Click="OpenCommandMenu_Click" AutomationProperties.Name="Сортировка"><Button.Content><StackPanel Orientation="Horizontal"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Sort"/><TextBlock x:Name="SortLabel" Text="Сортировка" Margin="8,0,0,0" VerticalAlignment="Center"/></StackPanel></Button.Content><Button.ContextMenu><ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"><MenuItem Header="Имя" Command="{Binding SortResultsCommand}" CommandParameter="Имя"/>
+<MenuItem Header="Размер" Command="{Binding SortResultsCommand}" CommandParameter="Размер"/>
+<MenuItem Header="Дата изменения" Command="{Binding SortResultsCommand}" CommandParameter="Дата изменения"/>
+<MenuItem Header="Тип" Command="{Binding SortResultsCommand}" CommandParameter="Тип"/>
+<MenuItem Header="Дата создания" Command="{Binding SortResultsCommand}" CommandParameter="Дата создания"/><Separator/>
+<MenuItem Header="По возрастанию" IsCheckable="True" IsChecked="{Binding IsSortAscending, Mode=OneWay}" Command="{Binding SetSortDirectionCommand}" CommandParameter="ascending"/>
+<MenuItem Header="По убыванию" IsCheckable="True" IsChecked="{Binding IsSortDescending, Mode=OneWay}" Command="{Binding SetSortDirectionCommand}" CommandParameter="descending"/></ContextMenu></Button.ContextMenu></Button>
+      <Button x:Name="ViewMenuButton" Style="{StaticResource CommandButton}" Click="OpenCommandMenu_Click" AutomationProperties.Name="Вид" ToolTip="Вид"><Button.Content><StackPanel Orientation="Horizontal"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="List"/><TextBlock x:Name="ViewLabel" Text="Вид" Margin="8,0,0,0" VerticalAlignment="Center"/></StackPanel></Button.Content>
+       <Button.ContextMenu><ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+        <MenuItem Header="Показать навигацию в узкой панели" IsCheckable="True" Click="ToggleNavigation_Click"/><Separator/><MenuItem Header="Таблица" IsCheckable="True" IsChecked="{Binding IsTableView, Mode=OneWay}" Command="{Binding SetViewCommand}" CommandParameter="table"/>
+        <MenuItem Header="Карта места" IsCheckable="True" IsChecked="{Binding SpaceMapOpen, Mode=OneWay}" Command="{Binding SetViewCommand}" CommandParameter="map"/>
+        <Separator/>
+        <MenuItem Header="Компактные строки" IsCheckable="True" IsChecked="{Binding CompactMode, Mode=TwoWay}"/>
+        
+        <MenuItem Header="Показывать галочки всегда" IsCheckable="True" IsChecked="{Binding AlwaysShowCheckboxes, Mode=TwoWay}"/>
+        <MenuItem Header="Режим выбора" IsCheckable="True" IsChecked="{Binding SelectionModeActive, Mode=TwoWay}"/>
+        <MenuItem Header="Сведения и предпросмотр" IsCheckable="True" IsChecked="{Binding ShowPreviewPane, Mode=TwoWay}"/>
+        <Separator/><MenuItem Header="Столбцы" SubmenuOpened="ColumnsSubmenu_Opened"><MenuItem Header="Настроить столбцы"/></MenuItem>
+       </ContextMenu></Button.ContextMenu>
+      </Button>
+      <Button Style="{StaticResource IconButton}" Click="OpenCommandMenu_Click" ToolTip="Другие действия" AutomationProperties.Name="Другие действия"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="More"/>
+       <Button.ContextMenu><ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+        <MenuItem Header="Копировать" Command="{Binding CopyFilesCommand}"/><MenuItem Header="Вырезать" Command="{Binding CutFilesCommand}"/><MenuItem Header="Вставить" Command="{Binding PasteFilesCommand}"/><MenuItem Header="Переименовать" Command="{Binding RenameSelectedCommand}"/><MenuItem Header="В корзину" Command="{Binding DeleteSelectedCommand}"/><Separator/><MenuItem Header="Быстрый просмотр" Command="{Binding PreviewSelectedCommand}" InputGestureText="Пробел"/><MenuItem Header="Отменить действие" Command="{Binding UndoLastCommand}" InputGestureText="Ctrl+Z"/><MenuItem Header="История буфера файлов" Command="{Binding ShowClipboardHistoryCommand}" InputGestureText="Ctrl+Shift+V"/><Separator/><MenuItem Header="Найти дубликаты" Command="{Binding FindDuplicatesCommand}"/><MenuItem Header="Очистка папки" Command="{Binding CleanFolderCommand}"/><Separator/><MenuItem Header="Пакетное переименование…" Command="{Binding BatchRenameSelectedCommand}" IsEnabled="{Binding HasSelection}"/><Separator/><MenuItem Header="Как пользоваться Seekr" Command="{Binding ShowHelpCommand}" InputGestureText="F1"/><Separator/><MenuItem Header="Пересчитать размеры" Command="{Binding RecalculateSizesCommand}"/>
+        <MenuItem Header="Кто использует выбранные файлы?" Command="{Binding InspectLocksCommand}" IsEnabled="{Binding HasSelection}"/>
+        <MenuItem Header="Закрепить текущую папку слева" Command="{Binding PinCurrentFolderCommand}"/><MenuItem Header="Копировать пути" Command="{Binding CopyPathsCommand}"/>
+        <MenuItem Header="Открыть путь…" Command="{Binding OpenPathCommand}" InputGestureText="Ctrl+L"/>
+        <Separator/>
+        <MenuItem Header="Найти крупные файлы" Command="{Binding FindLargeFilesCommand}"/>
+        <MenuItem Header="Найти старые файлы" Command="{Binding FindOldFilesCommand}"/>
+        <MenuItem Header="Найти временные файлы" Command="{Binding FindTempFilesCommand}"/>
+        <MenuItem Header="Найти пустые папки" Command="{Binding FindEmptyFoldersCommand}"/>
+        <Separator/>
+        <MenuItem Header="Отменить последнее действие" Command="{Binding UndoLastCommand}" InputGestureText="Ctrl+Z" ToolTip="Переименование/перемещение на одном диске без замены, до 64 МБ. Полные ограничения — в «Истории операций»."/>
+        <MenuItem Header="История операций" Command="{Binding ShowOperationsCommand}"/>
+        <MenuItem Header="Сообщить об ошибке" Command="{Binding ReportIssueCommand}"/>
+        <MenuItem Header="Состояние поиска и служба" Command="{Binding ShowIndexStatusCommand}"/>
+        <MenuItem Header="Открыть корзину" Command="{Binding OpenRecycleBinCommand}"/>
+       </ContextMenu></Button.ContextMenu>
+      </Button>
+     </StackPanel>
+     <Button x:Name="DetailsButton" Grid.Column="2" Style="{StaticResource CommandButton}" Command="{Binding TogglePreviewCommand}" ToolTip="Сведения и предпросмотр" AutomationProperties.Name="Сведения и предпросмотр"><StackPanel Orientation="Horizontal"><icons:SeekrIcon x:Name="DetailsIcon" Style="{StaticResource Seekr.Icon}" Kind="Details" Margin="0,0,8,0"/><TextBlock x:Name="DetailsLabel" Text="Сведения"/></StackPanel></Button>
+    </Grid>
+   </Border>
+   <Border x:Name="ErrorBanner" Visibility="{Binding HasErrorMessage, Converter={StaticResource BoolToVisibility}}" Margin="12,4" Padding="12,8" CornerRadius="4" Background="{DynamicResource Seekr.ErrorSurface}" BorderBrush="{DynamicResource Seekr.ErrorBorder}" BorderThickness="2,0,0,0">
+    <DockPanel LastChildFill="True">
+     <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Command="{Binding ClearErrorCommand}" AutomationProperties.Name="Скрыть ошибку" ToolTip="Скрыть ошибку"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Close"/></Button>
+     <Button DockPanel.Dock="Right" Content="Повторить" Style="{StaticResource CommandButton}" Command="{Binding RefreshCommand}" Margin="8,0"/>
+     <icons:SeekrIcon Style="{StaticResource Seekr.Icon}" DockPanel.Dock="Left" Kind="Warning" Margin="0,0,12,0" Foreground="{DynamicResource Seekr.ErrorText}"/>
+     <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource Seekr.ErrorText}" TextWrapping="Wrap" VerticalAlignment="Center" AutomationProperties.LiveSetting="Assertive"/>
+    </DockPanel>
+   </Border>
+   <WrapPanel Margin="12,4" Visibility="{Binding HasQuery, Converter={StaticResource BoolToVisibility}}"><Button Content="Сохранить поиск…" Command="{Binding SaveSearchCommand}" Style="{StaticResource CommandButton}" ToolTip="Ctrl+S · Повторно открыть запрос из боковой панели"/><Button Content="Область поиска" Click="SearchOptions_Click" Style="{StaticResource CommandButton}" Margin="8,0,0,0"/></WrapPanel>
+   <ItemsControl ItemsSource="{Binding QuerySuggestions}" Margin="12,4" Visibility="{Binding IsKeyboardFocusWithin, ElementName=SearchBox, Converter={StaticResource BoolToVisibility}}">
+    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+    <ItemsControl.ItemTemplate><DataTemplate><Button Focusable="False" Command="{Binding DataContext.InsertSuggestionCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" Margin="0,0,6,4" Padding="8,4"><StackPanel><TextBlock Text="{Binding Token}"/><TextBlock Text="{Binding Description}" FontSize="11" Foreground="{DynamicResource Seekr.TextSecondary}"/></StackPanel></Button></DataTemplate></ItemsControl.ItemTemplate>
+   </ItemsControl>
+   <ItemsControl ItemsSource="{Binding ActiveFilters}" Visibility="{Binding ActiveFilters.Count, Converter={StaticResource CountToVisibility}}" Margin="12,4">
+    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+    <ItemsControl.ItemTemplate><DataTemplate><Button Command="{Binding DataContext.RemoveFilterCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" Style="{StaticResource CommandButton}" Background="{DynamicResource Seekr.Surface}" Padding="8,3" MinHeight="26" Margin="0,0,6,0" ToolTip="Удалить фильтр"><StackPanel Orientation="Horizontal"><TextBlock Text="{Binding Label}"/><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Close" Margin="8,0,0,0"/></StackPanel></Button></DataTemplate></ItemsControl.ItemTemplate>
+   </ItemsControl>
+   <Grid Height="2"><ProgressBar x:Name="SearchProgress" IsIndeterminate="{Binding ShowSearchProgress}" Height="2" BorderThickness="0" Background="Transparent" Visibility="{Binding ShowSearchProgress, Converter={StaticResource BoolToVisibility}}" AutomationProperties.Name="Выполняется поиск или открытие папки"/></Grid>
+  </StackPanel>
+  <Popup x:Name="FiltersPopup" IsOpen="{Binding FiltersOpen, Mode=TwoWay}" PlacementTarget="{Binding ElementName=FilterAnchor}" Opened="FilterPopup_Opened" Placement="Custom" StaysOpen="False" AllowsTransparency="True">
+   <Border Background="{DynamicResource Seekr.MenuSurface}" BorderBrush="{DynamicResource Seekr.Divider}" BorderThickness="1" Padding="18" CornerRadius="8" Width="360" LayoutTransform="{DynamicResource Seekr.ContentScale}" Tag="filter" PreviewKeyDown="PopupSurface_PreviewKeyDown" KeyboardNavigation.TabNavigation="Cycle">
+    <StackPanel><TextBlock Text="Фильтры поиска" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,14"/>
+     <CheckBox Content="Только типы — без остальных условий" IsChecked="{Binding OnlyFileTypes}" Margin="0,0,0,12"/><TextBlock Text="Расширения: txt; pdf; docx"/><ui:TextBox Style="{StaticResource Seekr.FormInput}" x:Name="ExtensionFilterBox" Text="{Binding ExtensionFilter, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="pdf;docx;txt" AutomationProperties.Name="Типы файлов" Margin="0,4,0,12"/>
+     <TextBlock Text="Больше, МБ"/><ui:TextBox Style="{StaticResource Seekr.FormInput}" Text="{Binding MinimumSizeMb, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="100" AutomationProperties.Name="Минимальный размер" Margin="0,4,0,12"/>
+     <TextBlock Text="Дата изменения"/><ComboBox ItemsSource="{Binding DateFilters}" SelectedItem="{Binding DateFilter}" AutomationProperties.Name="Дата изменения" Margin="0,4,0,16"/>
+     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="Сбросить" Command="{Binding ClearFiltersCommand}" Margin="0,0,8,0"/><Button Content="Применить" Command="{Binding ApplyFiltersCommand}"/></StackPanel>
+    </StackPanel>
+   </Border>
+  </Popup>
+  <Popup x:Name="SavedSearchPopup" IsOpen="{Binding SaveSearchOpen, Mode=TwoWay}" PlacementTarget="{Binding ElementName=SaveSearchAnchor}" Placement="Custom" StaysOpen="False" AllowsTransparency="True" Opened="SaveSearchPopup_Opened">
+   <Border Background="{DynamicResource Seekr.MenuSurface}" BorderBrush="{DynamicResource Seekr.Divider}" BorderThickness="1" Padding="18" CornerRadius="8" Width="320" LayoutTransform="{DynamicResource Seekr.ContentScale}" Tag="save" PreviewKeyDown="PopupSurface_PreviewKeyDown" KeyboardNavigation.TabNavigation="Cycle">
+    <StackPanel><TextBlock Text="Сохранить поиск" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/><ui:TextBox Style="{StaticResource Seekr.FormInput}" x:Name="SavedSearchNameBox" Text="{Binding SavedSearchName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Название поиска" Margin="0,0,0,12"/>
+     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="Отмена" Command="{Binding CancelSaveSearchCommand}" Margin="0,0,8,0"/><Button Content="Сохранить" Command="{Binding ConfirmSaveSearchCommand}"/></StackPanel>
+    </StackPanel>
+   </Border>
+  </Popup>
+  <Grid Grid.Row="1" x:Name="FilesArea">
+   <Grid.ColumnDefinitions><ColumnDefinition x:Name="NavigationColumn" Width="208" MinWidth="140" MaxWidth="320"/><ColumnDefinition x:Name="SidebarSplitterColumn" Width="4"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <Border x:Name="SidebarSurface" Grid.Column="0" Background="{DynamicResource Seekr.Sidebar}" BorderBrush="{DynamicResource Seekr.Divider}" BorderThickness="0,0,1,0" Padding="0,8,0,0">
+    <TreeView x:Name="NavigationTree" ItemsSource="{Binding NavigationItems}" Foreground="{DynamicResource Seekr.TextPrimary}" ItemContainerStyle="{StaticResource NavigationNode}" BorderThickness="0" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Папки, диски и сохранённые поиски"
+     ContextMenuOpening="NavigationTree_ContextMenuOpening" SelectedItemChanged="NavigationTree_SelectedItemChanged" PreviewMouseRightButtonDown="NavigationTree_PreviewMouseRightButtonDown" PreviewMouseLeftButtonDown="NavigationTree_PreviewMouseLeftButtonDown" MouseMove="NavigationTree_MouseMove" AllowDrop="True" DragEnter="NavigationTree_DragEnter" Drop="NavigationTree_Drop">
+     <TreeView.ContextMenu><ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"><MenuItem Header="Открепить папку" Command="{Binding HideNavigationCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/><MenuItem Header="Переименовать сохранённый поиск" Command="{Binding RenameSavedSearchCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/><MenuItem Header="Заменить текущими условиями" Command="{Binding UpdateSavedSearchCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/><MenuItem Header="Удалить сохранённый поиск" Command="{Binding RemoveSavedSearchCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/></ContextMenu></TreeView.ContextMenu>
+     <TreeView.Resources><Style TargetType="TreeViewItem" BasedOn="{StaticResource NavigationNode}"/><HierarchicalDataTemplate DataType="{x:Type vm:NavigationItem}" ItemsSource="{Binding Children}">
+      <Grid><Grid.Style><Style TargetType="Grid"><Setter Property="MinHeight" Value="24"/><Style.Triggers><DataTrigger Binding="{Binding IsSeparator}" Value="True"><Setter Property="Height" Value="10"/><Setter Property="MinHeight" Value="0"/></DataTrigger></Style.Triggers></Style></Grid.Style><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Border Grid.ColumnSpan="2" Height="1" Background="{DynamicResource Seekr.Divider}" VerticalAlignment="Center" Visibility="{Binding IsSeparator, Converter={StaticResource BoolToVisibility}}"/>
+       <Image Source="{Binding Icon}" Width="18" Height="18" Margin="0,0,10,0" Visibility="{Binding Icon, Converter={StaticResource NotNullToVisibility}}"/>
+       <icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="{Binding Symbol}" Margin="0,0,10,0" Visibility="{Binding Icon, Converter={StaticResource NullToVisibility}}"/>
+       <TextBlock Grid.Column="1" Text="{Binding Label}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="FontSize" Value="13"/><Style.Triggers><DataTrigger Binding="{Binding IsSeparator}" Value="True"><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Foreground" Value="{DynamicResource Seekr.TextSecondary}"/><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+      </Grid>
+     </HierarchicalDataTemplate></TreeView.Resources>
+    </TreeView>
+   </Border>
+   <GridSplitter x:Name="SidebarSplitter" Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="Transparent" ShowsPreview="True"/>
+   <ListView x:Name="ResultsList" Grid.Column="2" ItemsSource="{Binding Results}" Foreground="{DynamicResource Seekr.TextPrimary}" BorderThickness="0" Background="Transparent" SelectionMode="Extended" ScrollViewer.HorizontalScrollBarVisibility="Auto" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True" AutomationProperties.Name="Файлы и папки" Visibility="{Binding SpaceMapOpen, Converter={StaticResource InvertedBoolToVisibility}}"
+    MouseDoubleClick="ResultsList_MouseDoubleClick" KeyDown="ResultsList_KeyDown" GridViewColumnHeader.Click="ResultsList_ColumnHeaderClick" PreviewMouseRightButtonDown="ResultsList_PreviewMouseRightButtonDown" PreviewMouseLeftButtonUp="ResultsList_PreviewMouseLeftButtonUp">
+    <ListView.Resources>
+     <Style x:Key="ColumnHeader" TargetType="GridViewColumnHeader">
+      <Setter Property="Height" Value="30"/><Setter Property="Padding" Value="10,4"/><Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontWeight" Value="Normal"/><Setter Property="HorizontalContentAlignment" Value="Left"/>
+      <Setter Property="Background" Value="{DynamicResource Seekr.Sidebar}"/><Setter Property="Foreground" Value="{DynamicResource Seekr.TextSecondary}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="GridViewColumnHeader">
+       <Grid><Border x:Name="HeaderSurface" Background="{TemplateBinding Background}" BorderBrush="{DynamicResource Seekr.Divider}" BorderThickness="0,0,0,1" Padding="{TemplateBinding Padding}" ClipToBounds="True">
+        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" RecognizesAccessKey="True"/>
+       </Border><Thumb x:Name="PART_HeaderGripper" Width="5" HorizontalAlignment="Right" Cursor="SizeWE"><Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="Transparent"/></ControlTemplate></Thumb.Template></Thumb></Grid>
+       <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="HeaderSurface" Property="Background" Value="{DynamicResource Seekr.Hover}"/></Trigger><Trigger Property="IsPressed" Value="True"><Setter TargetName="HeaderSurface" Property="Background" Value="{DynamicResource Seekr.Pressed}"/></Trigger></ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+     </Style>
+     <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource ColumnHeader}"/>
+     <Style TargetType="ListViewItem">
+      <Setter Property="Foreground" Value="{DynamicResource Seekr.TextPrimary}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListViewItem">
+       <Grid><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+        <GridViewRowPresenter Content="{TemplateBinding Content}" Columns="{Binding View.Columns, RelativeSource={RelativeSource AncestorType=ListView}}" SnapsToDevicePixels="True"/>
+       </Border><Border x:Name="RowFocus" BorderThickness="1" BorderBrush="{DynamicResource Seekr.Focus}" CornerRadius="3" Margin="1" IsHitTestVisible="False" Visibility="Collapsed"/></Grid>
+       <ControlTemplate.Triggers><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="RowFocus" Property="Visibility" Value="Visible"/></Trigger></ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+      <Setter Property="MinHeight" Value="36"/><Setter Property="Padding" Value="4,5"/><Setter Property="Background" Value="Transparent"/><Setter Property="BorderThickness" Value="2,0,0,0"/><Setter Property="BorderBrush" Value="Transparent"/><Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+      <Style.Triggers>
+       <DataTrigger Binding="{Binding DataContext.CompactMode, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True"><Setter Property="MinHeight" Value="30"/><Setter Property="Padding" Value="4,2"/></DataTrigger>
+       <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{DynamicResource Seekr.Hover}"/></Trigger>
+       <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="{DynamicResource Seekr.Selection}"/><Setter Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}"/></Trigger>
+       <MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True"/><Condition Binding="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource AncestorType=ListView}}" Value="False"/></MultiDataTrigger.Conditions><Setter Property="Background" Value="{DynamicResource Seekr.InactiveSelection}"/></MultiDataTrigger>
+      </Style.Triggers>
+     </Style>
+    </ListView.Resources>
+    <ListView.ContextMenu><ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+     <MenuItem Header="Открыть" Command="{Binding NavigateToCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+     <MenuItem Header="Показать в папке" Command="{Binding ShowInFolderCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+     <Separator/><MenuItem Header="Копировать" Command="{Binding CopyFilesCommand}" InputGestureText="Ctrl+C"/><MenuItem Header="Вырезать" Command="{Binding CutFilesCommand}" InputGestureText="Ctrl+X"/><MenuItem Header="Вставить" Command="{Binding PasteFilesCommand}" InputGestureText="Ctrl+V"/><MenuItem Header="Переименовать" Command="{Binding RenameSelectedCommand}" InputGestureText="F2"/>
+     <Separator/><MenuItem Header="Пересчитать размеры" Command="{Binding RecalculateSizesCommand}"/><MenuItem Header="Кто использует файлы?" Command="{Binding InspectLocksCommand}"/><MenuItem Header="Копировать пути" Command="{Binding CopyPathsCommand}"/>
+     <Separator/><MenuItem Header="В корзину" Command="{Binding DeleteSelectedCommand}" InputGestureText="Delete"/><MenuItem Header="Удалить безвозвратно" Command="{Binding PermanentDeleteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}" InputGestureText="Shift+Delete"/>
+    </ContextMenu></ListView.ContextMenu>
+    <ListView.View><GridView x:Name="ResultsGrid" AllowsColumnReorder="True">
+     <GridViewColumn x:Name="SelectionColumn" Width="38"><GridViewColumn.HeaderContainerStyle><Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource ColumnHeader}"><Setter Property="Padding" Value="0"/><Setter Property="HorizontalContentAlignment" Value="Center"/></Style></GridViewColumn.HeaderContainerStyle><GridViewColumn.Header><Button Command="{Binding SelectAllCommand}" ToolTip="Выбрать всё · Ctrl+A" AutomationProperties.Name="Выбрать все файлы" Style="{StaticResource CommandButton}" Padding="2,0" MinWidth="24" MinHeight="24" Opacity="0.65"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Check" Width="14" Height="14"/></Button></GridViewColumn.Header><GridViewColumn.CellTemplate><DataTemplate><CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" AutomationProperties.Name="{Binding Name}" Style="{StaticResource QuietCheckbox}"/></DataTemplate></GridViewColumn.CellTemplate></GridViewColumn>
+     <GridViewColumn Header="Имя" Width="300"><GridViewColumn.CellTemplate><DataTemplate>
+      <Grid Margin="2,0" ToolTip="{Binding FullPath}"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+       <Image Source="{Binding Converter={StaticResource FileIconConverter}}" Width="18" Height="18" Margin="0,0,10,0" VerticalAlignment="Center"/>
+       <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" FontSize="13"/>
+        <TextBlock Text="{Binding Folder}" TextTrimming="CharacterEllipsis" FontSize="11" Foreground="{DynamicResource Seekr.TextSecondary}" Visibility="{Binding DataContext.ShowResultPaths, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"/>
+       </StackPanel>
+      </Grid>
+     </DataTemplate></GridViewColumn.CellTemplate></GridViewColumn>
+     <GridViewColumn Header="Размер" Width="112"><GridViewColumn.CellTemplate><DataTemplate>
+      <Grid MaxWidth="94" HorizontalAlignment="Stretch" ToolTip="{Binding SizeStatus}">
+
+       <TextBlock Text="{Binding SizeString}" TextAlignment="Right" HorizontalAlignment="Stretch" TextTrimming="CharacterEllipsis" Typography.NumeralAlignment="Tabular" FontSize="13"/>
+      </Grid>
+     </DataTemplate></GridViewColumn.CellTemplate></GridViewColumn>
+     <GridViewColumn Header="Свободно" Width="112"><GridViewColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding FreeSpaceString}" TextAlignment="Right" MaxWidth="94" TextTrimming="CharacterEllipsis" ToolTip="Доступное свободное место на диске"/></DataTemplate></GridViewColumn.CellTemplate></GridViewColumn>
+     <GridViewColumn Header="Дата изменения" Width="154" DisplayMemberBinding="{Binding ModifiedString}"/>
+     <GridViewColumn Header="Тип" Width="144" DisplayMemberBinding="{Binding TypeString}"/>
+     <GridViewColumn Header="Дата создания" Width="154" DisplayMemberBinding="{Binding CreatedString}"/>
+    </GridView></ListView.View>
+   </ListView>
+            <Border Grid.Column="2" Margin="0" Padding="20" Background="{DynamicResource Seekr.Surface}" Visibility="{Binding SpaceMapOpen, Converter={StaticResource BoolToVisibility}}">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+                        <TextBlock Text="Что занимает место" FontSize="22" FontWeight="SemiBold"/>
+                        <TextBlock Text="Крупнейшие элементы · результаты уточняются по мере подсчёта" TextWrapping="Wrap" Opacity="0.75" Margin="0,6,0,0"/>
+                    </StackPanel>
+                    <ListBox ItemsSource="{Binding SpaceMapItems}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" AutomationProperties.Name="Карта занятого места">
+                        <ListBox.ItemTemplate><DataTemplate>
+                            <Button Command="{Binding DataContext.NavigateToCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" HorizontalContentAlignment="Stretch" Padding="10" Background="Transparent" BorderThickness="0">
+                                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <StackPanel><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" MaxWidth="400" HorizontalAlignment="Left"/>
+                                        <Border Background="{DynamicResource AccentFillColorDefaultBrush}" Height="8" Width="{Binding SizeBarWidth}" HorizontalAlignment="Left" CornerRadius="4" Margin="0,8,0,4"/>
+                                        <TextBlock Text="{Binding SizeStatus}" FontSize="11" Opacity="0.75" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="{Binding SizeString}" FontWeight="SemiBold" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Button>
+                        </DataTemplate></ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+   <Border x:Name="EmptyStatePanel" Grid.Column="2" Panel.ZIndex="2" Background="{DynamicResource Seekr.Canvas}" Margin="0,32,0,0" Visibility="{Binding Results.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=Inverted}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Center">
+     <StackPanel Margin="24" MaxWidth="380" HorizontalAlignment="Center">
+      <Grid Height="48" Margin="0,0,0,16">
+       <icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="{Binding EmptyStateSymbol}" Width="32" Height="32" Foreground="{DynamicResource Seekr.TextSecondary}" Visibility="{Binding IsSearching, Converter={StaticResource InvertedBoolToVisibility}}"/>
+       <ui:ProgressRing Width="32" Height="32" IsIndeterminate="{Binding ShowSearchProgress}" Visibility="{Binding ShowSearchProgress, Converter={StaticResource BoolToVisibility}}" AutomationProperties.Name="Загрузка"/>
+      </Grid>
+      <TextBlock Text="{Binding EmptyStateTitle}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center" AutomationProperties.LiveSetting="Polite"/>
+      <TextBlock Text="{Binding EmptyStateHint}" Margin="0,8,0,20" Foreground="{DynamicResource Seekr.TextSecondary}" TextWrapping="Wrap" TextAlignment="Center"/>
+      <Button Style="{StaticResource Seekr.StateAction}" Content="Повторить" Command="{Binding RefreshCommand}" HorizontalAlignment="Center" Visibility="{Binding CanRetryEmptyState, Converter={StaticResource BoolToVisibility}}"/>
+      <Button Style="{StaticResource Seekr.StateAction}" Content="Сбросить поиск" Command="{Binding ResetEmptySearchCommand}" HorizontalAlignment="Center" Visibility="{Binding CanResetEmptySearch, Converter={StaticResource BoolToVisibility}}"/>
+      <Button Style="{StaticResource Seekr.StateAction}" Content="Создать папку" Command="{Binding CreateFolderCommand}" HorizontalAlignment="Center" Visibility="{Binding CanCreateInEmptyFolder, Converter={StaticResource BoolToVisibility}}"/>
+     </StackPanel>
+    </ScrollViewer>
+   </Border>
+            <Border x:Name="PreviewPanel" Grid.Column="3" Panel.ZIndex="5" Width="260" Padding="16" Margin="0" ClipToBounds="True" BorderThickness="1,0,0,0" BorderBrush="{DynamicResource Seekr.Divider}" Background="{DynamicResource Seekr.MenuSurface}" Visibility="Collapsed">
+                <DockPanel><Grid DockPanel.Dock="Top" Margin="0,0,0,16"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Сведения" TextWrapping="Wrap" FontWeight="SemiBold" VerticalAlignment="Center"/><Button Grid.Column="1" Style="{StaticResource Seekr.IconButton}" Command="{Binding TogglePreviewCommand}" ToolTip="Закрыть сведения" AutomationProperties.Name="Закрыть сведения"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Close"/></Button></Grid>
+                <WrapPanel DockPanel.Dock="Bottom" Margin="0,12,0,0" IsEnabled="{Binding HasSelection}"><Button Content="Просмотр" ToolTip="Быстрый просмотр · Пробел" Command="{Binding PreviewSelectedCommand}" Style="{StaticResource CommandButton}"/><Button Content="Копировать путь" Command="{Binding CopyPathsCommand}" Style="{StaticResource CommandButton}"/></WrapPanel><ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><TextBlock Text="{Binding PreviewText}" TextWrapping="Wrap" FontSize="13"/></ScrollViewer></DockPanel>
+            </Border>
+  </Grid>
+  <Grid Grid.Row="2" Background="{DynamicResource Seekr.Sidebar}" Margin="10,0">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Visibility="{Binding HasSelection, Converter={StaticResource InvertedBoolToVisibility}}"><TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" MaxWidth="560" FontSize="12" Foreground="{DynamicResource Seekr.TextSecondary}" ToolTip="{Binding Status}"/></StackPanel>
+   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Visibility="{Binding HasSelection, Converter={StaticResource BoolToVisibility}}"><TextBlock Text="{Binding SelectionText}" FontSize="12" ToolTip="Размеры содержимого; неполные данные отмечены" VerticalAlignment="Center"/><Button Content="Снять выбор" Command="{Binding ClearSelectionCommand}" Style="{StaticResource CommandButton}" FontSize="11" Padding="8,2" MinHeight="24" Margin="10,0,0,0"/></StackPanel>
+   <Button Grid.Column="1" Content="{Binding OperationsLabel}" Command="{Binding ShowOperationsCommand}" Style="{StaticResource CommandButton}" Padding="8,2" MinHeight="24" FontSize="12" Margin="8,0" Visibility="{Binding HasOperationNotice, Converter={StaticResource BoolToVisibility}}"/>
+  </Grid>
+ </Grid>
+</UserControl>
+
+
+
+
+
+
+

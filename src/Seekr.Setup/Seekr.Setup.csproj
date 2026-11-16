@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net10.0-windows</TargetFramework><UseWPF>true</UseWPF><ApplicationIcon>../Seekr.App/Assets/Brand/Seekr-square.ico</ApplicationIcon><ApplicationManifest>app.manifest</ApplicationManifest></PropertyGroup>
+ <ItemGroup><Resource Include="../Seekr.App/Assets/Brand/Seekr-square.png" Link="Brand.png"/><Resource Include="../Seekr.App/Assets/Brand/Seekr-square.ico" Link="Brand.ico"/><EmbeddedResource Include="../../LICENSE" LogicalName="Seekr.License"/><InternalsVisibleTo Include="Seekr.Setup.Tests"/></ItemGroup>
+ <ItemGroup Condition="'$(SetupPayload)' != ''"><EmbeddedResource Include="$(SetupPayload)" LogicalName="Seekr.Payload.msi"/></ItemGroup>
+ <ItemGroup><AssemblyMetadata Include="PayloadSha256" Value="$(SetupPayloadSha256)"/></ItemGroup>
+</Project>

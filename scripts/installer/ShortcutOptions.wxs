@@ -1,0 +1,24 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <UI Id="SeekrShortcutOptions">
+      <Dialog Id="SeekrShortcutDlg" Width="370" Height="270" Title="[ProductName] — Настройка">
+        <Control Id="Title" Type="Text" X="20" Y="20" Width="330" Height="25" Transparent="yes" Text="{\WixUI_Font_Bigger}Ярлык на рабочем столе" />
+        <Control Id="Description" Type="Text" X="20" Y="60" Width="325" Height="35" Text="Выберите, как открывать Seekr после установки." />
+        <Control Id="DesktopShortcut" Type="CheckBox" X="20" Y="110" Width="325" Height="20" Property="ADD_DESKTOP_SHORTCUT" CheckBoxValue="1" Text="Создать ярлык на рабочем столе" />
+        <Control Id="StartMenuNote" Type="Text" X="20" Y="145" Width="325" Height="35" Text="Ярлык в меню «Пуск» будет создан в любом случае." />
+        <Control Id="Line" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="Назад">
+          <Publish Event="NewDialog" Value="WelcomeDlg" />
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="Далее">
+          <Publish Event="NewDialog" Value="LicenseAgreementDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Отмена">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+      </Dialog>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="SeekrShortcutDlg" Order="2" Condition="NOT Installed" />
+      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="SeekrShortcutDlg" Order="2" />
+    </UI>
+  </Fragment>
+</Wix>

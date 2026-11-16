@@ -1,0 +1,187 @@
+<ui:FluentWindow x:Class="Seekr.App.SettingsWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:local="clr-namespace:Seekr.App" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 UseLayoutRounding="True" SnapsToDevicePixels="True" Foreground="{DynamicResource Seekr.TextPrimary}" Background="{DynamicResource Seekr.Canvas}" FontFamily="{DynamicResource Seekr.TextFont}" FontSize="13" Title="Настройки" Width="820" Height="700" MinWidth="640" MinHeight="420"
+                 WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="None">
+    <ui:FluentWindow.Resources>
+      <Style x:Key="SettingsTab" TargetType="TabItem">
+        <Setter Property="Foreground" Value="{DynamicResource Seekr.TextPrimary}"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabItem">
+          <Border x:Name="Row" Padding="12,10" Margin="0,2" CornerRadius="5" Background="Transparent"><ContentPresenter ContentSource="Header"/></Border>
+          <ControlTemplate.Triggers><Trigger Property="IsSelected" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource Seekr.Selection}"/></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource Seekr.Focus}"/><Setter TargetName="Row" Property="BorderThickness" Value="1"/></Trigger></ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+      </Style>
+    </ui:FluentWindow.Resources>
+    <Grid Background="{DynamicResource Seekr.MenuSurface}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <local:SeekrTitleBar Grid.Row="0" Title="Настройки" />
+
+        <TabControl ItemContainerStyle="{StaticResource SettingsTab}" TabStripPlacement="Left" Grid.Row="1" Margin="20,8,20,12" LayoutTransform="{DynamicResource Seekr.ContentScale}">
+        <TabControl.Template><ControlTemplate TargetType="TabControl"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="140"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Border BorderBrush="{DynamicResource Seekr.Border}" BorderThickness="0,0,1,0" Padding="0,0,12,0"><TabPanel IsItemsHost="True" KeyboardNavigation.TabIndex="0"/></Border><ContentPresenter Grid.Column="1" x:Name="PART_SelectedContentHost" ContentSource="SelectedContent"/></Grid></ControlTemplate></TabControl.Template>
+        <TabItem Header="Оформление">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="16,12">
+            <StackPanel>
+                <TextBlock Text="Согласованные стили интерфейса" FontSize="20" Margin="0,0,0,10"/>
+                <Button Content="Графит · матовое оформление" Command="{Binding ApplyDesignCommand}" CommandParameter="Graphite" HorizontalAlignment="Left" Margin="0,0,0,12"/>
+                <WrapPanel><Button Content="Blueprint · чертёж" Command="{Binding ApplyDesignCommand}" CommandParameter="Blueprint" Margin="0,0,8,8"/><Button Content="Paper · бумага" Command="{Binding ApplyDesignCommand}" CommandParameter="Paper" Margin="0,0,8,8"/><Button Content="Terminal · консоль" Command="{Binding ApplyDesignCommand}" CommandParameter="Terminal" Margin="0,0,8,8"/><Button Content="Studio · графит" Command="{Binding ApplyDesignCommand}" CommandParameter="Studio" Margin="0,0,8,8"/><Button Content="Lagoon · спокойный" Command="{Binding ApplyDesignCommand}" CommandParameter="Lagoon" Margin="0,0,8,8"/><Button Content="Arcade · 8-bit" Command="{Binding ApplyDesignCommand}" CommandParameter="Arcade" Margin="0,0,8,8"/><Button Content="Sakura · аниме" Command="{Binding ApplyDesignCommand}" CommandParameter="Sakura" Margin="0,0,8,8"/><Button Content="Polar · холодный" Command="{Binding ApplyDesignCommand}" CommandParameter="Polar" Margin="0,0,8,8"/><Button Content="Velvet · фиолетовый" Command="{Binding ApplyDesignCommand}" CommandParameter="Velvet" Margin="0,0,8,8"/><Button Content="Rose · мягкий" Command="{Binding ApplyDesignCommand}" CommandParameter="Rose" Margin="0,0,8,8"/></WrapPanel>
+                <TextBlock Text="Профили меняют палитру панелей, выделение, акцент, шрифт, формы элементов, иконки и фон." TextWrapping="Wrap" Margin="0,0,0,12"/>
+                <ComboBox ItemsSource="{Binding Designs}" SelectedItem="{Binding Settings.Design}" AutomationProperties.Name="Палитра интерфейса" Margin="0,0,0,16"/>
+                <TextBlock Text="Быстрая настройка" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,12" />
+                <WrapPanel Margin="0,0,0,20">
+                    <Button Content="Комфортный" Padding="12,8" Margin="0,0,8,8" Command="{Binding ApplyProfileCommand}" CommandParameter="Comfortable"/>
+                    <Button Content="Компактный" Padding="12,8" Margin="0,0,8,8" Command="{Binding ApplyProfileCommand}" CommandParameter="Compact"/>
+                    <Button Content="Для очистки" Padding="12,8" Margin="0,0,0,8" Command="{Binding ApplyProfileCommand}" CommandParameter="Cleanup"/>
+                </WrapPanel>
+                <!-- Appearance -->
+                <TextBlock Text="Внешний вид" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16" />
+
+                <Border Background="{DynamicResource Seekr.Sidebar}" CornerRadius="8" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Тема" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding Themes}" SelectedItem="{Binding Settings.Theme}" />
+                        </Grid>
+
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Цвет акцента" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding AccentColors}" SelectedItem="{Binding SelectedAccentColor}" DisplayMemberPath="Name" />
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="60" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Масштаб интерфейса" VerticalAlignment="Center" />
+                            <Slider Grid.Column="1" Minimum="0.75" Maximum="1.5" Value="{Binding Settings.UiScale}" TickFrequency="0.05" IsSnapToTickEnabled="True" />
+                            <TextBlock Grid.Column="2" Text="{Binding Settings.UiScale, StringFormat={}{0:P0}}" Margin="8,0,0,0" VerticalAlignment="Center" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{DynamicResource Seekr.Sidebar}" CornerRadius="8" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <ui:ToggleSwitch OnContent="Компактный режим" OffContent="Компактный режим"
+                                         IsChecked="{Binding Settings.CompactMode}" Margin="0,0,0,8" />
+                        <ui:ToggleSwitch OnContent="Всегда показывать галочки выбора" OffContent="Всегда показывать галочки выбора" IsChecked="{Binding Settings.AlwaysShowCheckboxes}" Margin="0,0,0,8"/>
+                        
+                        <ui:ToggleSwitch OnContent="Показывать панель предпросмотра" OffContent="Показывать панель предпросмотра"
+                                         IsChecked="{Binding Settings.ShowPreviewPane}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{DynamicResource Seekr.Sidebar}" CornerRadius="8" Padding="16" Margin="0,0,0,12"><StackPanel>
+                <TextBlock Text="Персонализация" FontSize="20" Margin="0,0,0,12"/>
+                <WrapPanel Margin="0,0,0,12"><Button Content="Арена / MOBA" Command="{Binding ApplyArtProfileCommand}" CommandParameter="Rune" Margin="0,0,6,6"/><Button Content="Тактика" Command="{Binding ApplyArtProfileCommand}" CommandParameter="Tactical" Margin="0,0,6,6"/></WrapPanel>
+                <TextBlock Text="PhotoCoupe / PhotoRally — машины; PhotoLake — озеро; PhotoGarden — сад; PhotoSnow — зимний лес. Профили задают тему, шрифт, акцент и иконки; их можно настроить отдельно." TextWrapping="Wrap" Margin="0,0,0,12"/>
+                <TextBlock Text="Свой акцент · #RRGGBB (пусто — цвет из списка)"/><TextBox Text="{Binding Settings.CustomAccent, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Свой цвет акцента" Margin="0,4,0,12"/>
+                <TextBlock Text="Шрифт"/><ComboBox ItemsSource="{Binding Fonts}" SelectedItem="{Binding Settings.Font}" AutomationProperties.Name="Шрифт" Margin="0,4,0,12"/>
+                <Button Content="Выбрать свои обои…" Command="{Binding ChooseWallpaperCommand}" Margin="0,4,0,8"/><TextBlock Text="{Binding Settings.CustomWallpaper}" TextTrimming="CharacterEllipsis" Margin="0,0,0,8"/><TextBlock Text="Фон · Solid — однотонный"/><ComboBox ItemsSource="{Binding Backgrounds}" SelectedItem="{Binding Settings.Background}" AutomationProperties.Name="Фон" Margin="0,4,0,12"/>
+                <TextBlock Text="Иконки · 11 собственных стилей"/><TextBlock Text="Pixel — 8-bit; Anime — мягкие формы; Rune — фэнтези; Tactical — тактика; Neon — неон; Blueprint — чертёж; Paper — бумага; Minimal — минимализм." TextWrapping="Wrap" FontSize="12" Margin="0,4,0,4"/><ComboBox ItemsSource="{Binding IconStyles}" SelectedItem="{Binding Settings.IconStyle}" AutomationProperties.Name="Стиль иконок" Margin="0,4,0,12"/>
+                </StackPanel></Border>
+                </StackPanel></ScrollViewer></TabItem>
+        <TabItem Header="Поиск"><ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="16,12"><StackPanel>
+<!-- Search -->
+                <TextBlock Text="Поиск" FontSize="20" FontWeight="SemiBold" Margin="0,8,0,16" />
+
+                <Border Background="{DynamicResource Seekr.Sidebar}" CornerRadius="8" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Лимит результатов" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding SearchLimits}" SelectedItem="{Binding Settings.SearchResultLimit}" />
+                        </Grid>
+
+                        <ui:ToggleSwitch OnContent="Показывать скрытые файлы" OffContent="Показывать скрытые файлы"
+                                         IsChecked="{Binding Settings.ShowHiddenFiles}" Margin="0,0,0,8" />
+                        <ui:ToggleSwitch OnContent="Показывать системные файлы" OffContent="Показывать системные файлы"
+                                         IsChecked="{Binding Settings.ShowSystemFiles}" />
+                    </StackPanel>
+                </Border>
+
+                </StackPanel></ScrollViewer></TabItem>
+        <TabItem Header="Поведение"><ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="16,12"><StackPanel>
+<!-- Behavior -->
+                <Button Content="Вернуть стандартные папки слева" Command="{Binding RestoreNavigationCommand}" Margin="0,0,0,16"/><TextBlock Text="Поведение" FontSize="20" FontWeight="SemiBold" Margin="0,8,0,16" />
+
+                <Border Background="{DynamicResource Seekr.Sidebar}" CornerRadius="8" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <ui:ToggleSwitch OnContent="Показывать размер папок" OffContent="Показывать размер папок"
+                                         IsChecked="{Binding Settings.ShowFolderSizes}" Margin="0,0,0,8" />
+                        <ui:ToggleSwitch OnContent="Открывать одним кликом" OffContent="Открывать одним кликом"
+                                         IsChecked="{Binding Settings.OpenWithSingleClick}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Index -->
+                <TextBlock Text="Индексация" FontSize="20" FontWeight="SemiBold" Margin="0,8,0,16" />
+
+                <Border Background="{DynamicResource Seekr.Sidebar}" CornerRadius="8" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <ui:ToggleSwitch OnContent="Автообновление индекса" OffContent="Автообновление индекса"
+                                         IsChecked="{Binding Settings.AutoRefreshIndex}" Margin="0,0,0,12" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Интервал (секунды)" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding RefreshIntervals}" SelectedItem="{Binding Settings.AutoRefreshIntervalSeconds}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                </StackPanel></ScrollViewer></TabItem>
+        <TabItem Header="О программе"><ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="16,12"><StackPanel>
+<!-- About -->
+                <TextBlock Text="О приложении" FontSize="20" FontWeight="SemiBold" Margin="0,8,0,16" />
+
+                <Border Background="{DynamicResource Seekr.Sidebar}" CornerRadius="8" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Версия" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{Binding Version}" VerticalAlignment="Center" Opacity="0.7" />
+                        </Grid>
+
+                        <Button Content="Сообщить об ошибке" Command="{Binding ReportIssueCommand}" HorizontalAlignment="Left" Margin="0,0,0,12"/>
+                        <Button Content="Открыть диагностические отчёты" Command="{Binding OpenDiagnosticsCommand}" HorizontalAlignment="Left" Margin="0,0,0,12"/><ui:Button Style="{StaticResource Seekr.ActionButton}" Appearance="Secondary" Content="Сбросить настройки" Command="{Binding ResetCommand}" HorizontalAlignment="Left" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer></TabItem></TabControl>
+
+        <WrapPanel Margin="24,0,24,20" LayoutTransform="{DynamicResource Seekr.ContentScale}" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Text="{Binding SaveStatus}" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="{DynamicResource Seekr.TextSecondary}"/>
+            <Button Content="Вернуть изменения" Command="{Binding RevertCommand}" Margin="0,0,12,0"/><ui:Button Style="{StaticResource Seekr.ActionButton}" Appearance="Primary" Content="Готово" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+        </WrapPanel>
+    </Grid>
+</ui:FluentWindow>
+
+
+
+

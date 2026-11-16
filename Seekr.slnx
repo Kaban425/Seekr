@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Seekr.App/Seekr.App.csproj" />
+    <Project Path="src/Seekr.Core/Seekr.Core.csproj" />
+    <Project Path="src/Seekr.Elevated/Seekr.Elevated.csproj" />
+    <Project Path="src/Seekr.Indexer/Seekr.Indexer.csproj" />
+    <Project Path="src/Seekr.Setup/Seekr.Setup.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Seekr.App.Tests/Seekr.App.Tests.csproj" />
+    <Project Path="tests/Seekr.Core.Tests/Seekr.Core.Tests.csproj" />
+    <Project Path="tests/Seekr.Indexer.Tests/Seekr.Indexer.Tests.csproj" />
+    <Project Path="tests/Seekr.Setup.Tests/Seekr.Setup.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/Seekr.PortableCheck/Seekr.PortableCheck.csproj" />
+    <Project Path="tools/Seekr.LiveCheck/Seekr.LiveCheck.csproj" />
+    <Project Path="tools/Seekr.Benchmarks/Seekr.Benchmarks.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,16 @@
+<ui:FluentWindow x:Class="Seekr.App.LocksWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+ UseLayoutRounding="True" SnapsToDevicePixels="True" Foreground="{DynamicResource Seekr.TextPrimary}" Background="{DynamicResource Seekr.MenuSurface}" FontFamily="{DynamicResource Seekr.TextFont}" FontSize="13" Title="Кто использует файлы?" Width="680" Height="460" WindowStartupLocation="CenterOwner">
+ <DockPanel Margin="24" LayoutTransform="{DynamicResource Seekr.ContentScale}">
+  <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12"><Button x:Name="CloseWindowButton" DockPanel.Dock="Right" Content="Закрыть" Click="CloseWindow_Click" AutomationProperties.Name="Закрыть проверку блокировок"/><TextBlock Text="Кто использует файлы?" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/></DockPanel>
+  <TextBlock x:Name="StateText" DockPanel.Dock="Top" Text="Проверяем блокировки…" TextWrapping="Wrap" Margin="0,0,0,16"/>
+  <WrapPanel DockPanel.Dock="Bottom" Margin="0,16,0,0">
+   <Button x:Name="CloseAppButton" Content="Закрыть приложение" Click="CloseApp_Click" Margin="0,0,8,8" IsEnabled="False"/>
+   <Button x:Name="ForceButton" Content="Завершить принудительно" Click="Force_Click" Margin="0,0,8,8" IsEnabled="False"/>
+   <Button x:Name="RetryDeleteButton" Content="Повторить удаление" Click="Retry_Click" Margin="0,0,8,8"/>
+  </WrapPanel>
+  <ListBox x:Name="ApplicationsList" SelectionChanged="ApplicationsList_SelectionChanged" AutomationProperties.Name="Приложения, удерживающие файлы">
+   <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="8"><TextBlock Text="{Binding Name}" FontWeight="SemiBold"/><TextBlock Text="{Binding ProcessId, StringFormat=PID: {0}}"/></StackPanel></DataTemplate></ListBox.ItemTemplate>
+  </ListBox>
+ </DockPanel>
+</ui:FluentWindow>

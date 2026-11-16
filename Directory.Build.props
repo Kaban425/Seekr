@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/._*;**/.DS_Store</DefaultItemExcludes>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <Deterministic>true</Deterministic>
+    <Company>Seekr contributors</Company>
+    <Product>Seekr</Product>
+    <Copyright>Copyright (c) 2026 Seekr contributors</Copyright>
+    <Version>1.0.6</Version>
+    <BuildNumber Condition="'$(BuildNumber)' == ''">1</BuildNumber>
+    <AssemblyVersion>$(Version).0</AssemblyVersion>
+    <FileVersion>$(Version).$(BuildNumber)</FileVersion>
+    <InformationalVersion>$(Version)+build.$(BuildNumber)</InformationalVersion>
+  </PropertyGroup>
+</Project>

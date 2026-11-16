@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ошибка или предложение для Seekr
+    url: https://github.com/Kaban425/Seekr-Feedback/issues/new/choose
+    about: Общий список ошибок и предложений, инструкция и готовые сборки.

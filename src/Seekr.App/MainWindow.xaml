@@ -1,0 +1,156 @@
+<ui:FluentWindow x:Class="Seekr.App.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:icons="clr-namespace:Seekr.App.Icons" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:vm="clr-namespace:Seekr.App.ViewModels"
+                 xmlns:local="clr-namespace:Seekr.App"
+                 xmlns:converters="clr-namespace:Seekr.App.Converters"
+                 UseLayoutRounding="True" SnapsToDevicePixels="True" Foreground="{DynamicResource Seekr.TextPrimary}" Background="{DynamicResource Seekr.Canvas}" FontFamily="{DynamicResource Seekr.TextFont}" FontSize="13" Title="Seekr" Width="1240" Height="800" MinWidth="840" MinHeight="520"
+                 WindowStartupLocation="CenterScreen" Icon="/Seekr.App;component/Assets/Brand/Seekr-square.ico"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="None"
+                 WindowCornerPreference="Round"
+                 KeyDown="FluentWindow_KeyDown"
+                 MouseWheel="FluentWindow_MouseWheel">
+    <ui:FluentWindow.Resources>
+        <DataTemplate x:Key="WorkspaceTemplate" DataType="{x:Type vm:WorkspaceViewModel}"><local:WorkspaceView/></DataTemplate>
+        <converters:ChromeContentWidthConverter x:Key="ChromeContentWidth"/>
+    </ui:FluentWindow.Resources>
+    <Grid Background="{DynamicResource Seekr.Canvas}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <local:SeekrTitleBar PreviewMouseLeftButtonDown="Caption_MouseDown" PreviewMouseMove="Caption_MouseMove" Grid.Row="0" Title="" Height="40" Padding="0" AutomationProperties.Name="Вкладки и управление окном">
+            <local:SeekrTitleBar.Header>
+            <Border Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=local:SeekrTitleBar}, Converter={StaticResource ChromeContentWidth}}" Padding="8,3,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <ListBox Grid.Column="0" x:Name="TabList"
+                         ItemsSource="{Binding Workspaces}"
+                         SelectedItem="{Binding SelectedWorkspace}"
+                         BorderThickness="0" Background="Transparent"
+                         ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                         PreviewMouseWheel="TabList_PreviewMouseWheel" PreviewMouseDown="TabList_PreviewMouseDown"
+                         ScrollViewer.CanContentScroll="False"
+                         AutomationProperties.Name="Вкладки"
+                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Foreground" Value="{DynamicResource Seekr.TextPrimary}"/>
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="4,0,0,0" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Grid>
+                                            <Border x:Name="Root" Background="Transparent" CornerRadius="8,8,0,0"
+                                                    BorderThickness="1" BorderBrush="Transparent" Padding="1,1,1,0">
+                                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                            </Border>
+                                            <Border x:Name="Indicator" Height="2" VerticalAlignment="Bottom" CornerRadius="2,2,0,0"
+                                                    Background="{DynamicResource AccentFillColorDefaultBrush}" Opacity="0" Margin="8,0" />
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Root" Property="Background" Value="{DynamicResource Seekr.Surface}" />
+                                                <Setter TargetName="Root" Property="BorderBrush" Value="Transparent" />
+
+                                                <Setter TargetName="Indicator" Property="Opacity" Value="0.55" />
+                                                <Setter Property="Panel.ZIndex" Value="10" />
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Root" Property="Background" Value="{DynamicResource Seekr.Surface}" />
+                                            </Trigger>
+                                            <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource Seekr.Focus}"/></Trigger>
+                                    </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:WorkspaceViewModel}">
+                            <Border MinWidth="150" MaxWidth="240" ToolTip="{Binding CurrentPath}" Height="36" Padding="12,0" CornerRadius="8,8,0,0">
+                                <Grid VerticalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image Grid.Column="0" Source="{Binding Icon}" Width="18" Height="18" Margin="0,0,10,0" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Title}" VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" FontSize="13" />
+                                    <Button Grid.Column="2" Margin="10,0,0,0" Padding="2"
+                                            Style="{StaticResource Seekr.IconButton}" Width="28" Height="28" MinHeight="28" MinWidth="28"
+                                            Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip="Закрыть вкладку (Ctrl+W)">
+                                        <icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Close" />
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
+                    <Button Content="Команды" Click="Commands_Click" ToolTip="Панель команд · Ctrl+K" Style="{StaticResource Seekr.CommandButton}"/><Button Style="{StaticResource Seekr.IconButton}" Command="{Binding ToggleDualPaneCommand}" ToolTip="Две панели · Ctrl+Shift+D" AutomationProperties.Name="Двухпанельный режим"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Details"/></Button>
+                    <Button Style="{StaticResource Seekr.IconButton}"
+                               Command="{Binding NewTabCommand}"
+                               ToolTip="Новая вкладка (Ctrl+T)">
+                        <Button.Content>
+                            <icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Add" />
+                        </Button.Content>
+                    </Button>
+                    <Button Style="{StaticResource Seekr.IconButton}"
+                               Command="{Binding OpenSettingsCommand}"
+                               ToolTip="Настройки">
+                        <Button.Content>
+                            <icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Settings" />
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+            </Grid>
+            </Border>
+            </local:SeekrTitleBar.Header>
+        </local:SeekrTitleBar>
+
+        <Grid x:Name="WorkspaceSurface" Grid.Row="1" LayoutTransform="{DynamicResource Seekr.ContentScale}">
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition><ColumnDefinition.Style><Style TargetType="ColumnDefinition"><Setter Property="Width" Value="0"/><Style.Triggers><DataTrigger Binding="{Binding IsDualPane}" Value="True"><Setter Property="Width" Value="*"/></DataTrigger></Style.Triggers></Style></ColumnDefinition.Style></ColumnDefinition></Grid.ColumnDefinitions>
+            <WrapPanel Grid.ColumnSpan="3" Margin="12,4" Visibility="{Binding IsDualPane, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock Text="{Binding PaneActivity}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                <Button Content="Копировать в другую панель" Command="{Binding CopyToOtherPaneCommand}" ToolTip="Ctrl+Shift+C" Margin="0,0,8,0"/>
+                <Button Content="Переместить в другую панель" Command="{Binding MoveToOtherPaneCommand}" ToolTip="Ctrl+Shift+X"/>
+            </WrapPanel>
+            <Border BorderThickness="0,1,0,0" Grid.Row="1" Tag="left" PreviewMouseDown="Pane_Activated" GotKeyboardFocus="Pane_Activated">
+                <Border.Style><Style TargetType="Border"><Setter Property="BorderBrush" Value="Transparent"/><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding IsDualPane}" Value="True"/><Condition Binding="{Binding IsRightPaneActive}" Value="False"/></MultiDataTrigger.Conditions><Setter Property="BorderBrush" Value="{DynamicResource Seekr.Divider}"/></MultiDataTrigger></Style.Triggers></Style></Border.Style>
+                <ContentControl x:Name="LeftPaneContent" Content="{Binding SelectedWorkspace}" ContentTemplate="{StaticResource WorkspaceTemplate}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            </Border>
+            <GridSplitter Grid.Row="1" Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="{DynamicResource Seekr.Divider}" Visibility="{Binding IsDualPane, Converter={StaticResource BoolToVisibility}}"/>
+            <Border BorderThickness="0,1,0,0" Grid.Row="1" Grid.Column="2" Tag="right" PreviewMouseDown="Pane_Activated" GotKeyboardFocus="Pane_Activated" Visibility="{Binding IsDualPane, Converter={StaticResource BoolToVisibility}}">
+                <Border.Style><Style TargetType="Border"><Setter Property="BorderBrush" Value="Transparent"/><Style.Triggers><DataTrigger Binding="{Binding IsRightPaneActive}" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource Seekr.Divider}"/></DataTrigger></Style.Triggers></Style></Border.Style>
+                <ContentControl x:Name="RightPaneContent" Content="{Binding SecondaryWorkspace}" ContentTemplate="{StaticResource WorkspaceTemplate}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            </Border>
+        </Grid>
+        <local:OperationNotice x:Name="OperationPanel" Grid.Row="1" Panel.ZIndex="20" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="12,0,12,36" LayoutTransform="{DynamicResource Seekr.ContentScale}"/>
+    </Grid>
+</ui:FluentWindow>
+
+
+
+
