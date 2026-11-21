@@ -1,5 +1,5 @@
 #Requires -Version 7.2
-param([Parameter(Mandatory)][string]$MsiPath,[Parameter(Mandatory)][string]$OutputPath,[string]$Version='1.0.6',[int]$BuildNumber=7)
+param([Parameter(Mandatory)][string]$MsiPath,[Parameter(Mandatory)][string]$OutputPath,[string]$Version='1.0.7',[int]$BuildNumber=8)
 $ErrorActionPreference='Stop'
 $repoRoot=Split-Path -Parent $PSScriptRoot
 $msi=(Resolve-Path -LiteralPath $MsiPath).Path

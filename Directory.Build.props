@@ -10,7 +10,7 @@
     <Company>Seekr contributors</Company>
     <Product>Seekr</Product>
     <Copyright>Copyright (c) 2026 Seekr contributors</Copyright>
-    <Version>1.0.6</Version>
+    <Version>1.0.7</Version>
     <BuildNumber Condition="'$(BuildNumber)' == ''">1</BuildNumber>
     <AssemblyVersion>$(Version).0</AssemblyVersion>
     <FileVersion>$(Version).$(BuildNumber)</FileVersion>

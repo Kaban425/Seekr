@@ -4,7 +4,7 @@ on:
     inputs:
       version:
         description: 'Version (major.minor.patch)'
-        default: '1.0.6'
+        default: '1.0.7'
         required: true
 permissions:
   contents: read

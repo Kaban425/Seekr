@@ -137,12 +137,7 @@ public sealed partial class WorkspaceViewModel
     {
         if (chip is not null) Query = string.Join(' ', Query.Split(' ', StringSplitOptions.RemoveEmptyEntries).Where(t => !t.Equals(chip.Token, StringComparison.OrdinalIgnoreCase)));
     }
-    [RelayCommand] private void SetView(string? view)
-    {
-        SpaceMapOpen = view == "map";
-        OnPropertyChanged(nameof(IsTableView));
-        OnPropertyChanged(nameof(SpaceMapOpen));
-    }
+    [RelayCommand] private void SetView(string? view) => SpaceMapOpen = view == "map";
     [RelayCommand] private void SortResults(string? column) { if (column is not null) SortBy(column); }
 
     private void SubscribeOperationActivity()

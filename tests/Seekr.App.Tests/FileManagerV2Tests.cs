@@ -8,14 +8,42 @@ namespace Seekr.App.Tests;
 public sealed partial class WorkspaceTests
 {
     [Fact]
+    public void DownloadsPresetsSwitchFromAllDisksAndSpaceMapToScopedFileSearch()
+    {
+        RunSta(() =>
+        {
+            using var workspace = new WorkspaceViewModel(persistViewSettings: false)
+            {
+                SpaceMapOpen = true,
+                SearchAllDisks = true,
+            };
+            var downloads = DownloadsFolder.GetPath();
+            Assert.False(string.IsNullOrEmpty(downloads));
+            workspace.FindInDownloadsCommand.Execute("today");
+            Assert.Equal(downloads, workspace.CurrentPath);
+            Assert.False(workspace.SearchAllDisks);
+            Assert.True(workspace.IsTableView);
+            Assert.Equal("kind:file dm:today", workspace.Query);
+            workspace.FindInDownloadsCommand.Execute("week");
+            Assert.Equal("kind:file dm:thisweek", workspace.Query);
+            workspace.FindInDownloadsCommand.Execute("pdf");
+            Assert.Equal("kind:file ext:pdf", workspace.Query);
+            Assert.True(workspace.IsSortDescending);
+        });
+    }
+
+    [Fact]
     public void DriveRowsShowCapacityAndFreeSpaceWithoutFolderEstimates()
     {
         var entry = new SearchResult(new FileEntry(0, -1, "C:\\", true, 0, DateTime.MinValue, DateTime.MinValue), "C:\\", 1000);
-        var drive = new ResultItem(entry, false, new DriveSpace(1000, 250, "NTFS"));
+        var drive = new ResultItem(entry, false, new DriveSpace(1000, 250, "NTFS", 400));
         Assert.True(drive.IsDrive); Assert.True(drive.HasMeasuredSize); Assert.False(drive.IsSizePartial);
         Assert.Equal("1000 B", drive.SizeString); Assert.Equal("250 B", drive.FreeSpaceString); Assert.Equal("Диск · NTFS", drive.TypeString);
         Assert.Empty(drive.ModifiedString);
+        Assert.Equal(600L, drive.UsedBytes);
+        Assert.Equal("Занято 600 B из 1000 B · Доступно 250 B", drive.MapSize);
         var unavailable = new ResultItem(entry);
+        Assert.Null(unavailable.UsedBytes);
         Assert.Equal("—", unavailable.SizeString); Assert.Equal(-1, unavailable.EffectiveSize);
         Assert.Contains("недоступны", unavailable.SizeStatus);
         var file = new ResultItem(new SearchResult(new FileEntry(1, -1, "note.txt", false, 5, DateTime.UtcNow, DateTime.UtcNow), @"C:\note.txt", 5));

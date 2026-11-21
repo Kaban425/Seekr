@@ -29,7 +29,7 @@ public static class WorkspaceSearchService
                 {
                     if (drive.IsReady)
                     {
-                        var capacity = new DriveSpace(drive.TotalSize, drive.AvailableFreeSpace, drive.DriveFormat);
+                        var capacity = new DriveSpace(drive.TotalSize, drive.AvailableFreeSpace, drive.DriveFormat, drive.TotalFreeSpace);
                         space[drive.Name] = capacity;
                         drives.Add(new(new FileEntry(drives.Count, -1, drive.Name, true, 0, DateTime.MinValue, DateTime.MinValue), drive.Name, capacity.Total));
                     }
@@ -66,7 +66,7 @@ public static class WorkspaceSearchService
             try
             {
                 var drive = new DriveInfo(match.FullPath);
-                if (drive.IsReady) driveSpaces[match.FullPath] = new(drive.TotalSize, drive.AvailableFreeSpace, drive.DriveFormat);
+                if (drive.IsReady) driveSpaces[match.FullPath] = new(drive.TotalSize, drive.AvailableFreeSpace, drive.DriveFormat, drive.TotalFreeSpace);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException) { }
         }

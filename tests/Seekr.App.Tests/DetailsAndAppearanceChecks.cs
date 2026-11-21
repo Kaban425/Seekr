@@ -40,6 +40,13 @@ public sealed partial class WorkspaceTests
             ScaleService.ApplyScale(1); vm.ShowPreviewPane=false;
             host.Measure(new Size(1440,800)); host.Arrange(new Rect(0,0,1440,800)); host.UpdateLayout();
             Assert.Equal(560,name.Width);
+            vm.ToggleSpaceMapCommand.Execute(null);
+            Assert.False(vm.IsTableView);
+            Assert.Equal("Документы", vm.SpaceMapItems[0].Name);
+            Arrange(host, 1100);
+            SaveVisual(host, "space-map-1.0.7");
+            vm.ToggleSpaceMapCommand.Execute(null);
+            Assert.True(vm.IsTableView);
             foreach (var theme in new[]{"Dark","Light"})
             {
                 ThemeService.ApplyTheme(theme);

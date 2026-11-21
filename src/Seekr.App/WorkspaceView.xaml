@@ -126,6 +126,11 @@
         <Separator/>
         <MenuItem Header="Найти крупные файлы" Command="{Binding FindLargeFilesCommand}"/>
         <MenuItem Header="Найти старые файлы" Command="{Binding FindOldFilesCommand}"/>
+        <MenuItem Header="Поиск в Загрузках">
+        <MenuItem Header="Изменены сегодня" Command="{Binding FindInDownloadsCommand}" CommandParameter="today"/>
+        <MenuItem Header="Изменены на этой неделе" Command="{Binding FindInDownloadsCommand}" CommandParameter="week"/>
+        <MenuItem Header="Только PDF" Command="{Binding FindInDownloadsCommand}" CommandParameter="pdf"/>
+        </MenuItem>
         <MenuItem Header="Найти временные файлы" Command="{Binding FindTempFilesCommand}"/>
         <MenuItem Header="Найти пустые папки" Command="{Binding FindEmptyFoldersCommand}"/>
         <Separator/>
@@ -137,7 +142,20 @@
        </ContextMenu></Button.ContextMenu>
       </Button>
      </StackPanel>
-     <Button x:Name="DetailsButton" Grid.Column="2" Style="{StaticResource CommandButton}" Command="{Binding TogglePreviewCommand}" ToolTip="Сведения и предпросмотр" AutomationProperties.Name="Сведения и предпросмотр"><StackPanel Orientation="Horizontal"><icons:SeekrIcon x:Name="DetailsIcon" Style="{StaticResource Seekr.Icon}" Kind="Details" Margin="0,0,8,0"/><TextBlock x:Name="DetailsLabel" Text="Сведения"/></StackPanel></Button>
+     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+      <Button x:Name="SpaceMapButton" Style="{StaticResource CommandButton}" Command="{Binding ToggleSpaceMapCommand}" ToolTip="Карта места · сравнить размеры" AutomationProperties.Name="Карта места">
+       <StackPanel Orientation="Horizontal"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Drive"/><TextBlock x:Name="SpaceMapLabel" Text="Карта места" Margin="8,0,0,0"/></StackPanel>
+      </Button>
+      <Button x:Name="DownloadsButton" Style="{StaticResource CommandButton}" Click="OpenCommandMenu_Click" ToolTip="Быстрый поиск в Загрузках" AutomationProperties.Name="Быстрый поиск в Загрузках">
+       <StackPanel Orientation="Horizontal"><icons:SeekrIcon Style="{StaticResource Seekr.Icon}" Kind="Download"/><TextBlock x:Name="DownloadsLabel" Text="Загрузки" Margin="8,0,0,0"/></StackPanel>
+       <Button.ContextMenu><ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+        <MenuItem Header="Изменены сегодня" Command="{Binding FindInDownloadsCommand}" CommandParameter="today"/>
+        <MenuItem Header="Изменены на этой неделе" Command="{Binding FindInDownloadsCommand}" CommandParameter="week"/>
+        <MenuItem Header="Только PDF" Command="{Binding FindInDownloadsCommand}" CommandParameter="pdf"/>
+       </ContextMenu></Button.ContextMenu>
+      </Button>
+     <Button x:Name="DetailsButton" Style="{StaticResource CommandButton}" Command="{Binding TogglePreviewCommand}" ToolTip="Сведения и предпросмотр" AutomationProperties.Name="Сведения и предпросмотр"><StackPanel Orientation="Horizontal"><icons:SeekrIcon x:Name="DetailsIcon" Style="{StaticResource Seekr.Icon}" Kind="Details" Margin="0,0,8,0"/><TextBlock x:Name="DetailsLabel" Text="Сведения"/></StackPanel></Button>
+     </StackPanel>
     </Grid>
    </Border>
    <Border x:Name="ErrorBanner" Visibility="{Binding HasErrorMessage, Converter={StaticResource BoolToVisibility}}" Margin="12,4" Padding="12,8" CornerRadius="4" Background="{DynamicResource Seekr.ErrorSurface}" BorderBrush="{DynamicResource Seekr.ErrorBorder}" BorderThickness="2,0,0,0">
@@ -257,18 +275,22 @@
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
                         <TextBlock Text="Что занимает место" FontSize="22" FontWeight="SemiBold"/>
-                        <TextBlock Text="Крупнейшие элементы · результаты уточняются по мере подсчёта" TextWrapping="Wrap" Opacity="0.75" Margin="0,6,0,0"/>
+                        <TextBlock Text="Для дисков полосы показывают заполненность. Для файлов и папок — размер относительно крупнейшего элемента в списке." TextWrapping="Wrap" Foreground="{DynamicResource Seekr.TextSecondary}" Margin="0,6,0,0"/>
+                        <TextBlock Text="Выберите строку, чтобы открыть диск, папку или файл. Знак ≥ означает неполный размер." TextWrapping="Wrap" Foreground="{DynamicResource Seekr.TextSecondary}" Margin="0,4,0,0"/>
                     </StackPanel>
                     <ListBox ItemsSource="{Binding SpaceMapItems}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" AutomationProperties.Name="Карта занятого места">
                         <ListBox.ItemTemplate><DataTemplate>
-                            <Button Command="{Binding DataContext.NavigateToCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" HorizontalContentAlignment="Stretch" Padding="10" Background="Transparent" BorderThickness="0">
-                                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                    <StackPanel><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" MaxWidth="400" HorizontalAlignment="Left"/>
-                                        <Border Background="{DynamicResource AccentFillColorDefaultBrush}" Height="8" Width="{Binding SizeBarWidth}" HorizontalAlignment="Left" CornerRadius="4" Margin="0,8,0,4"/>
-                                        <TextBlock Text="{Binding SizeStatus}" FontSize="11" Opacity="0.75" TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                    <TextBlock Grid.Column="1" Text="{Binding SizeString}" FontWeight="SemiBold" Margin="12,0,0,0" VerticalAlignment="Center"/>
-                                </Grid>
+                            <Button Command="{Binding DataContext.NavigateToCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}" HorizontalContentAlignment="Stretch" Padding="10"
+                                    Background="Transparent" BorderThickness="0" ToolTip="{Binding FullPath}"
+                                    AutomationProperties.Name="{Binding Name}" AutomationProperties.HelpText="{Binding MapSize}">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding MapSize}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                    <ProgressBar Value="{Binding MapPercent, Mode=OneWay}" Maximum="100" Height="8" Margin="0,7,0,0"
+                                                 Foreground="{DynamicResource AccentFillColorDefaultBrush}" Background="{DynamicResource Seekr.Divider}"
+                                                 Focusable="False" IsHitTestVisible="False"/>
+                                </StackPanel>
                             </Button>
                         </DataTemplate></ListBox.ItemTemplate>
                     </ListBox>

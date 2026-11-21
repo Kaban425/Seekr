@@ -1,7 +1,7 @@
 #Requires -Version 7.2
 param(
-    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '1.0.6',
-    [ValidateRange(1,65535)][int]$BuildNumber = 7,
+    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '1.0.7',
+    [ValidateRange(1,65535)][int]$BuildNumber = 8,
     [string]$CertificateThumbprint = '',
     [switch]$RequireSigned,
     [switch]$SkipTests

@@ -3,7 +3,7 @@ using Seekr.Core.Index;
 
 namespace Seekr.App.Services;
 
-public sealed record DriveSpace(long Total, long Free, string Format);
+public sealed record DriveSpace(long Total, long Free, string Format, long TotalFree);
 public sealed record DirectoryListing(IReadOnlyList<SearchResult> Entries, string? Error, Seekr.Core.Index.NameIndex? Snapshot = null, string? Notice = null,
     IReadOnlyDictionary<string, DriveSpace>? DriveSpaces = null);
 

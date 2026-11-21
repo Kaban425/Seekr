@@ -2,7 +2,7 @@
 param(
     [Parameter(Mandatory=$true)][string]$PayloadDirectory,
     [string]$OutputDirectory = '',
-    [string]$Version = '1.0.6'
+    [string]$Version = '1.0.7'
 )
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot

@@ -1,6 +1,6 @@
 # Установка и обновление
 
-Готовые файлы: [Seekr Releases](https://github.com/Kaban425/Seekr-Feedback/releases/tag/v1.0.6). Версия 1.0.6, сборка 7, Windows x64.
+Готовые файлы: [Seekr Releases](https://github.com/Kaban425/Seekr-Feedback/releases/tag/v1.0.7). Версия 1.0.7, сборка 8, Windows x64.
 
 1. Закройте запущенный Seekr и скачайте Setup.exe либо MSI. Одновременно устанавливать оба не нужно.
 2. Выберите папку и создание ярлыка. Установщик включает .NET и работает без интернета.

@@ -209,7 +209,7 @@ public sealed partial class WorkspaceViewModel : ObservableObject, IDisposable
         AddKnownFolder(items, Environment.SpecialFolder.Desktop, "Рабочий стол", Icons.IconKind.Desktop);
         AddKnownFolder(items, Environment.SpecialFolder.MyPictures, "Изображения", Icons.IconKind.Picture);
         AddKnownFolder(items, Environment.SpecialFolder.MyDocuments, "Документы", Icons.IconKind.Document);
-        AddKnownFolder(items, Environment.SpecialFolder.UserProfile, "Загрузки", Icons.IconKind.Download, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"));
+        AddKnownFolder(items, Environment.SpecialFolder.UserProfile, "Загрузки", Icons.IconKind.Download, Services.DownloadsFolder.GetPath() ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"));
         AddKnownFolder(items, Environment.SpecialFolder.MyMusic, "Музыка", Icons.IconKind.Music);
         AddKnownFolder(items, Environment.SpecialFolder.MyVideos, "Видео", Icons.IconKind.Video);
         AddKnownFolder(items, Environment.SpecialFolder.UserProfile, "Профиль", Icons.IconKind.Person);
@@ -451,6 +451,35 @@ public sealed partial class WorkspaceViewModel : ObservableObject, IDisposable
 
     [RelayCommand]
     private void FindOldFiles() => Query = "dm:<" + DateTime.Today.AddYears(-1).ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+    [RelayCommand]
+    private void FindInDownloads(string? preset)
+    {
+        var query = preset switch
+        {
+            "today" => "kind:file dm:today",
+            "week" => "kind:file dm:thisweek",
+            "pdf" => "kind:file ext:pdf",
+            _ => null,
+        };
+        if (query is null) return;
+
+        var folder = Services.DownloadsFolder.GetPath();
+        if (folder is null)
+        {
+            ReportError("Не удалось открыть папку «Загрузки». Проверьте, доступна ли она в Windows.");
+            return;
+        }
+
+        SpaceMapOpen = false;
+        SearchContents = false;
+        SearchAllDisks = false;
+        CurrentPath = folder;
+        SortBy("Дата изменения");
+        SetSortDirectionCommand.Execute("descending");
+        if (Query == query) _ = RunSearchAsync(query);
+        else Query = query;
+    }
 
     [RelayCommand]
     private void FindTempFiles() => Query = "ext:tmp;log;bak;cache";

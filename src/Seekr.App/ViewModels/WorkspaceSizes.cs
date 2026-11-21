@@ -12,8 +12,18 @@ public sealed partial class WorkspaceViewModel
     private bool _scopeChanged;
     private FolderWatcher? _folderWatcher;
     private CancellationTokenSource? _sizesCancellation;
-    [ObservableProperty] private bool _spaceMapOpen;
-    public IReadOnlyList<ResultItem> SpaceMapItems => Results.OrderByDescending(x => x.EffectiveSize).Take(50).ToArray();
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsTableView))] private bool _spaceMapOpen;
+
+    [RelayCommand]
+    private void ToggleSpaceMap() => SpaceMapOpen = !SpaceMapOpen;
+
+    partial void OnSpaceMapOpenChanged(bool value)
+    {
+        if (value) UpdateSizeMap();
+    }
+    public IReadOnlyList<ResultItem> SpaceMapItems => Results
+        .OrderByDescending(item => item.IsDrive ? item.UsedBytes ?? -1 : item.EffectiveSize)
+        .Take(50).ToArray();
 
     private void WatchFolder(string? path)
     {
@@ -64,8 +74,18 @@ public sealed partial class WorkspaceViewModel
 
     private void UpdateSizeMap()
     {
-        var largest = Results.Count == 0 ? 0 : Results.Max(x => x.EffectiveSize);
-        foreach (var item in Results) item.SizeBarWidth = largest > 0 ? Math.Max(0, item.EffectiveSize) / (double)largest * 180 : 0;
+        if (!SpaceMapOpen) return;
+        var largest = 0L;
+        foreach (var item in Results)
+            if (!item.IsDrive) largest = Math.Max(largest, item.EffectiveSize);
+
+        foreach (var item in Results)
+        {
+            if (item.IsDrive)
+                item.MapPercent = item.UsedBytes is { } used ? used / (double)item.EffectiveSize * 100 : 0;
+            else
+                item.MapPercent = largest > 0 ? Math.Max(0, item.EffectiveSize) / (double)largest * 100 : 0;
+        }
         OnPropertyChanged(nameof(SpaceMapItems));
     }
 }

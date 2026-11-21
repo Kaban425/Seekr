@@ -25,16 +25,20 @@ public sealed partial class ResultItem : ObservableObject
     public bool IsDrive { get; }
     public long? FreeBytes { get; }
     public string FreeSpaceString => FreeBytes is { } bytes ? FormatBytes(bytes) : string.Empty;
+    public long? UsedBytes { get; }
+    public string MapSize => IsDrive && UsedBytes is { } used
+        ? $"Занято {FormatBytes(used)} из {FormatBytes(EffectiveSize)} · Доступно {FreeSpaceString}"
+        : SizeString;
     private readonly bool _showFolderSizes;
     public string SizeString => IsDirectory && !IsDrive && !_showFolderSizes ? string.Empty : EffectiveSize < 0 ? IsDrive ? "—" : "Считается…" : (IsSizePartial ? "≥ " : string.Empty) + FormatBytes(EffectiveSize);
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SizeString))]
+    [NotifyPropertyChangedFor(nameof(SizeString), nameof(MapSize))]
     private long _effectiveSize;
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SizeString))]
+    [NotifyPropertyChangedFor(nameof(SizeString), nameof(MapSize))]
     private bool _isSizePartial;
     [ObservableProperty] private string _sizeStatus = "Размер из индекса";
-    [ObservableProperty] private double _sizeBarWidth;
+    [ObservableProperty] private double _mapPercent;
 
     public bool HasMeasuredSize { get; private set; }
 
@@ -61,6 +65,8 @@ public sealed partial class ResultItem : ObservableObject
         CreatedUtc = result.Entry.CreatedUtc;
         TypeString = IsDrive ? "Диск" + (driveSpace is null ? "" : " · " + driveSpace.Format) : FilePresentation.GetTypeName(IsDirectory, Extension);
         EffectiveSize = IsDrive ? driveSpace?.Total ?? -1 : result.EffectiveSize;
+        if (driveSpace is { Total: > 0 } && IsDrive)
+            UsedBytes = driveSpace.Total - Math.Clamp(driveSpace.TotalFree, 0, driveSpace.Total);
         _showFolderSizes = showFolderSizes;
         IsSizePartial = IsDirectory && !IsDrive && result.EffectiveSize >= 0;
         HasMeasuredSize = driveSpace is not null;

@@ -155,6 +155,10 @@ public partial class WorkspaceView
             foreach (var button in new[] { CreateFolderButton, SortMenuButton, ViewMenuButton, DetailsButton })
                 button.Padding = narrow ? new Thickness(8, 6, 8, 6) : new Thickness(12, 6, 12, 6);
             var tiny = ActualWidth > 0 && ActualWidth < 560;
+            var extraLabels = ActualWidth >= 1050 ? Visibility.Visible : Visibility.Collapsed;
+            SpaceMapLabel.Visibility = DownloadsLabel.Visibility = extraLabels;
+            SpaceMapButton.Padding = DownloadsButton.Padding = new Thickness(extraLabels == Visibility.Visible ? 12 : 6, 6, extraLabels == Visibility.Visible ? 12 : 6, 6);
+            SpaceMapButton.Visibility = DownloadsButton.Visibility = tiny ? Visibility.Collapsed : Visibility.Visible;
             EditActions.Visibility = tiny ? Visibility.Collapsed : Visibility.Visible;
             var hideSidebar = tiny && !_showCompactSidebar;
             SidebarSurface.Visibility = SidebarSplitter.Visibility = hideSidebar ? Visibility.Collapsed : Visibility.Visible;
